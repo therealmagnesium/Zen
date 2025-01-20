@@ -135,7 +135,7 @@ namespace Graphics
     void Shader::SetMaterial(const std::string& name, Material& material)
     {
         SetVec3(name + ".diffuse", material.diffuse);
-        SetInt(name + ".diffuseMap", material.diffuseMap.id);
+        SetInt(name + ".diffuseMap", 0);
     }
 
     void Shader::SetLight(const std::string& name, DirectionalLight& light)

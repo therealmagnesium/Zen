@@ -12,6 +12,24 @@ namespace Graphics
     static bool isInitialized = false;
     RenderManager* Renderer = NULL;
 
+    static u32 FaceCullToGL(FaceCull cull)
+    {
+        u32 val = 0;
+
+        switch (cull)
+        {
+            case FaceCull::Back:
+                val = GL_BACK;
+                break;
+
+            case FaceCull::Front:
+                val = GL_FRONT;
+                break;
+        }
+
+        return val;
+    }
+
     void RenderManager::Initialize()
     {
         if (isInitialized)
@@ -31,76 +49,22 @@ namespace Graphics
     void RenderManager::Shutdown()
     {
         INFO("Shutting down the renderer...");
-
-        for (auto& vao : m_vertexArrays)
-            DeleteVertexArray(vao);
-
-        for (auto& vbo : m_vertexBuffers)
-            DeleteVertexBuffer(vbo);
     }
 
-    void RenderManager::AddVertexArray(VertexIdentifier& vao)
+    void RenderManager::CalculateProjection()
     {
-        m_vertexArrays.push_back(vao);
-    }
-
-    void RenderManager::AddVertexBuffer(VertexIdentifier& vbo)
-    {
-        m_vertexBuffers.push_back(vbo);
-    }
-
-    VertexIdentifier RenderManager::StoreIndexBuffer(u32* indices, u32 indexCount)
-    {
-        VertexIdentifier ebo = CreateIndexBuffer();
-
-        BindIndexBuffer(ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(u32), indices, GL_STATIC_DRAW);
-        UnbindIndexBuffer();
-
-        return ebo;
-    }
-
-    void RenderManager::ProcessEntity(std::shared_ptr<Core::Entity>& entity)
-    {
-        if (entity->HasComponent<Core::MeshComponent>())
-        {
-            auto& mc = entity->GetComponent<Core::MeshComponent>();
-
-            if (mc.mesh != NULL)
-            {
-                std::vector<std::shared_ptr<Core::Entity>>& batch = m_entitiesToRender[mc.mesh];
-
-                if (batch.size() > 0)
-                    batch.push_back(entity);
-                else
-                {
-                    std::vector<std::shared_ptr<Core::Entity>> newBatch;
-                    newBatch.push_back(entity);
-                    m_entitiesToRender[mc.mesh] = newBatch;
-                }
-            }
-        }
-    }
-
-    void RenderManager::StoreDataInAttributeList(u32 location, u32 numComponents, Vertex* data, u32 vertexCount,
-                                                 u64 offset)
-    {
-        VertexIdentifier vbo = CreateVertexBuffer();
-
-        BindVertexBuffer(vbo);
-        glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Vertex), data, GL_STATIC_DRAW);
-        glVertexAttribPointer(location, numComponents, GL_FLOAT, false, sizeof(Vertex), (void*)offset);
-        UnbindVertexBuffer();
+        Core::ApplicationSpecification& appInfo = Core::App->GetSpecification();
+        float aspectRatio = appInfo.windowWidth / (float)appInfo.windowHeight;
+        m_projection = glm::perspective(glm::radians(45.f), aspectRatio, 0.1f, 100.f);
     }
 
     void RenderManager::BeginDrawing()
     {
         glEnable(GL_DEPTH_TEST);
-        this->Clear();
+        glEnable(GL_CULL_FACE);
 
-        Core::ApplicationSpecification& appInfo = Core::App->GetSpecification();
-        float aspectRatio = appInfo.windowWidth / (float)appInfo.windowHeight;
-        m_projection = glm::perspective(glm::radians(45.f), aspectRatio, 0.1f, 100.f);
+        this->Clear();
+        this->CalculateProjection();
     }
 
     void RenderManager::EndDrawing()
@@ -115,91 +79,51 @@ namespace Graphics
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    void RenderManager::DrawAllMeshes(DirectionalLight& sun)
+    void RenderManager::CullFace(FaceCull cull)
     {
-        if (m_primaryShader != NULL)
+        u32 glCull = FaceCullToGL(cull);
+        glCullFace(glCull);
+    }
+
+    void RenderManager::Prepare(DirectionalLight& directionalLight, Shader& shader)
+    {
+        if (m_primaryCamera != NULL)
         {
-            BindShader(*m_primaryShader);
-            PrepareLightUniforms(sun);
+            shader.SetMat4("viewMatrix", m_primaryCamera->view);
+            shader.SetMat4("projectionMatrix", m_projection);
+            shader.SetLight("directionalLight", directionalLight);
+        }
+    }
+
+    void RenderManager::DrawEntity(std::shared_ptr<Core::Entity>& entity, Shader& shader)
+    {
+        if (m_primaryCamera != NULL && entity->HasComponent<Core::MeshComponent>())
+        {
+            auto& tc = entity->GetComponent<Core::TransformComponent>();
+            auto& mc = entity->GetComponent<Core::MeshComponent>();
+            glm::mat4 normalMatrix = glm::transpose(glm::inverse(tc.transform));
+
+            shader.SetMat4("transformMatrix", tc.transform);
+            shader.SetMat4("normalMatrix", normalMatrix);
+            shader.SetMaterial("material", mc.mesh.material);
+
+            BindTexture(mc.mesh.material.diffuseMap, 0);
+            BindVertexArray(mc.mesh.vertexArray);
+            BindIndexBuffer(mc.mesh.indexBuffer);
 
             glEnableVertexAttribArray(0);
             glEnableVertexAttribArray(1);
             glEnableVertexAttribArray(2);
 
-            for (auto& [mesh, entities] : m_entitiesToRender)
-            {
-                PrepareMeshUniforms(*mesh);
-                for (auto& entity : entities)
-                {
-                    PrepareEntity(entity);
-                    glDrawElements(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, NULL);
-                }
-            }
+            glDrawElements(GL_TRIANGLES, mc.mesh.indexCount, GL_UNSIGNED_INT, NULL);
 
             glDisableVertexAttribArray(0);
             glDisableVertexAttribArray(1);
             glDisableVertexAttribArray(2);
 
-            UnbindShader();
-        }
-
-        m_entitiesToRender.clear();
-    }
-
-    void RenderManager::PrepareMeshUniforms(Mesh& mesh)
-    {
-        if (m_primaryShader != NULL)
-        {
-            m_primaryShader->SetMat4("viewMatrix", m_primaryCamera->view);
-            m_primaryShader->SetMat4("projectionMatrix", m_projection);
-            m_primaryShader->SetMaterial("material", mesh.material);
-        }
-
-        BindTexture(mesh.material.diffuseMap, mesh.material.diffuseMap.id);
-        BindVertexArray(mesh.vertexArray);
-        BindIndexBuffer(mesh.indexBuffer);
-    }
-
-    void RenderManager::PrepareLightUniforms(DirectionalLight& sun)
-    {
-        if (m_primaryShader != NULL)
-            m_primaryShader->SetLight("directionalLight", sun);
-    }
-
-    void RenderManager::PrepareEntity(std::shared_ptr<Core::Entity>& entity)
-    {
-        if (entity->HasComponent<Core::MeshComponent>())
-        {
-            auto& tc = entity->GetComponent<Core::TransformComponent>();
-            auto& mc = entity->GetComponent<Core::MeshComponent>();
-
-            const glm::vec3 xAxis = glm::vec3(1.f, 0.f, 0.f);
-            const glm::vec3 yAxis = glm::vec3(0.f, 1.f, 0.f);
-            const glm::vec3 zAxis = glm::vec3(0.f, 0.f, 1.f);
-
-            if (mc.mesh != NULL && m_primaryShader != NULL)
-            {
-                mc.mesh->transform = glm::mat4(1.f);
-                mc.mesh->transform = glm::translate(mc.mesh->transform, tc.position);
-                mc.mesh->transform = glm::rotate(mc.mesh->transform, glm::radians(tc.rotation.x), xAxis);
-                mc.mesh->transform = glm::rotate(mc.mesh->transform, glm::radians(tc.rotation.y), yAxis);
-                mc.mesh->transform = glm::rotate(mc.mesh->transform, glm::radians(tc.rotation.z), zAxis);
-                mc.mesh->transform = glm::scale(mc.mesh->transform, tc.scale);
-
-                glm::mat4 normal = glm::mat4(1.f);
-                normal = glm::transpose(glm::inverse(mc.mesh->transform));
-
-                m_primaryShader->SetMat4("transformMatrix", mc.mesh->transform);
-                m_primaryShader->SetMat4("normalMatrix", normal);
-            }
+            UnbindIndexBuffer();
+            UnbindVertexArray();
+            UnbindTexture();
         }
     }
-
-    void RenderManager::UnbindMesh()
-    {
-        UnbindIndexBuffer();
-        UnbindVertexArray();
-        UnbindTexture();
-    }
-
 }

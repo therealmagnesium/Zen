@@ -6,13 +6,15 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glad/glad.h>
 
-static Mesh mesh;
+static Mesh roomMesh;
+static Mesh miiMesh;
 static Shader phongShader;
 static Shader postProcessingShader;
 
 ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
 {
-    mesh = LoadMesh("assets/models/mii.fbx");
+    roomMesh = LoadMesh("assets/models/room.fbx");
+    miiMesh = LoadMesh("assets/models/mii.fbx");
 
     m_directionalLight.intensity = 1.5f;
     m_directionalLight.direction = glm::vec3(0.2f, -0.86f, -0.95f);
@@ -24,7 +26,6 @@ ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
     phongShader.CreateUniform("normalMatrix");
     phongShader.CreateUniform("viewMatrix");
     phongShader.CreateUniform("projectionMatrix");
-    Renderer->SetPrimaryShader(&phongShader);
 
     postProcessingShader = LoadShader("assets/shaders/PostProcessing_vs.glsl", "assets/shaders/PostProcessing_fs.glsl");
     postProcessingShader.CreateUniform("screenTexture");
@@ -34,19 +35,13 @@ ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
     m_camera.rotation = glm::vec3(-53.3f, -33.4f, 0.f);
     Renderer->SetPrimaryCamera(&m_camera);
 
-    for (s32 i = -5; i < 5; i++)
-    {
-        for (s32 j = -5; j < 5; j++)
-        {
-            m_entities[(i + 5) * 10 + (j + 5)] = m_entityManager.AddEntity("Entity");
-            auto& tc = m_entities[(i + 5) * 10 + (j + 5)]->GetComponent<TransformComponent>();
-            auto& mc = m_entities[(i + 5) * 10 + (j + 5)]->AddComponent<MeshComponent>(&mesh);
+    m_room = m_entityManager.AddEntity("Room");
+    m_room->AddComponent<TransformComponent>();
+    m_room->AddComponent<MeshComponent>(roomMesh);
 
-            tc.position.x = i * 1.8f;
-            tc.position.y = 0.f;
-            tc.position.z = j * 1.8f;
-        }
-    }
+    m_mii = m_entityManager.AddEntity("Mii");
+    m_mii->AddComponent<TransformComponent>();
+    m_mii->AddComponent<MeshComponent>(miiMesh);
 
     SceneViewportPanel::SetPostFXShader(postProcessingShader);
 }
@@ -55,7 +50,9 @@ void ZenEditor::OnShutdown()
 {
     UnloadShader(phongShader);
     UnloadShader(postProcessingShader);
-    UnloadMesh(mesh);
+
+    UnloadMesh(roomMesh);
+    UnloadMesh(miiMesh);
 }
 
 void ZenEditor::OnUpdate()
@@ -71,10 +68,17 @@ void ZenEditor::OnUpdate()
 
 void ZenEditor::OnRender()
 {
-    for (u32 i = 0; i < LEN(m_entities); i++)
-        Renderer->ProcessEntity(m_entities[i]);
+    BindShader(phongShader);
 
-    Renderer->DrawAllMeshes(m_directionalLight);
+    Renderer->Prepare(m_directionalLight, phongShader);
+
+    Renderer->CullFace(FaceCull::Front);
+    Renderer->DrawEntity(m_room, phongShader);
+
+    Renderer->CullFace(FaceCull::Back);
+    Renderer->DrawEntity(m_mii, phongShader);
+
+    UnbindShader();
 }
 
 void ZenEditor::OnRenderUI()

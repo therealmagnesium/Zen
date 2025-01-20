@@ -28,7 +28,7 @@ namespace Graphics
 
     struct Shader
     {
-        u32 id;
+        u32 id = 0;
         std::unordered_map<std::string, s32> uniforms;
 
         void CreateUniform(const std::string& name);

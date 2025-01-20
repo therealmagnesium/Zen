@@ -64,6 +64,22 @@ namespace Core
 
         m_toAdd.clear();
         m_toDestroy.clear();
+
+        for (auto& entity : m_entities)
+        {
+            if (entity->HasComponent<MeshComponent>())
+            {
+                auto& tc = entity->GetComponent<TransformComponent>();
+                auto& mc = entity->GetComponent<MeshComponent>();
+
+                tc.transform = glm::mat4(1.f);
+                tc.transform = glm::translate(tc.transform, tc.position);
+                tc.transform = glm::rotate(tc.transform, glm::radians(tc.rotation.x), glm::vec3(1.f, 0.f, 0.f));
+                tc.transform = glm::rotate(tc.transform, glm::radians(tc.rotation.y), glm::vec3(0.f, 1.f, 0.f));
+                tc.transform = glm::rotate(tc.transform, glm::radians(tc.rotation.z), glm::vec3(0.f, 0.f, 1.f));
+                tc.transform = glm::scale(tc.transform, tc.scale);
+            }
+        }
     }
 
     EntityVec& EntityManager::GetEntities()

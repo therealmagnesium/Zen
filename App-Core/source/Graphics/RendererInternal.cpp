@@ -1,5 +1,4 @@
 #include "Graphics/RendererInternal.h"
-#include "Graphics/Renderer.h"
 #include <glad/glad.h>
 
 namespace Graphics
@@ -8,7 +7,6 @@ namespace Graphics
     {
         VertexIdentifier vao;
         glGenVertexArrays(1, &vao.id);
-        Renderer->AddVertexArray(vao);
 
         return vao;
     }
@@ -22,9 +20,6 @@ namespace Graphics
     void UnbindVertexArray()
     {
         glBindVertexArray(0);
-
-        for (auto& vao : Renderer->GetVertexArrays())
-            vao.isSelected = false;
     }
 
     void DeleteVertexArray(VertexIdentifier& vao)
@@ -37,7 +32,6 @@ namespace Graphics
     {
         VertexIdentifier vbo;
         glGenBuffers(1, &vbo.id);
-        Renderer->AddVertexBuffer(vbo);
 
         return vbo;
     }
@@ -51,22 +45,12 @@ namespace Graphics
     void UnbindVertexBuffer()
     {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        for (auto& vbo : Renderer->GetVertexBuffers())
-            vbo.isSelected = false;
-    }
-
-    void DeleteVertexBuffer(VertexIdentifier& vbo)
-    {
-        glDeleteBuffers(1, &vbo.id);
-        vbo.isSelected = false;
     }
 
     VertexIdentifier CreateIndexBuffer()
     {
         VertexIdentifier ebo;
         glGenBuffers(1, &ebo.id);
-        Renderer->AddVertexBuffer(ebo);
 
         return ebo;
     }
@@ -80,8 +64,11 @@ namespace Graphics
     void UnbindIndexBuffer()
     {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
 
-        for (auto& ebo : Renderer->GetVertexBuffers())
-            ebo.isSelected = false;
+    void DeleteBuffer(VertexIdentifier& buffer)
+    {
+        glDeleteBuffers(1, &buffer.id);
+        buffer.isSelected = false;
     }
 }

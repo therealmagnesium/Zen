@@ -5,6 +5,8 @@
 #include "Core/Log.h"
 #include "Core/Time.h"
 
+#include "Graphics/Renderer.h"
+
 #include "UI/UI.h"
 
 #include <SDL2/SDL.h>
@@ -59,6 +61,7 @@ namespace Graphics
     void HandleWindowEvents(Window& window)
     {
         Core::UpdateTime();
+        Renderer->CalculateProjection();
 
         for (int i = 0; i < MOUSE_BUTTON_COUNT; i++)
             Core::Input.mouse.buttonsClicked[i] = false;

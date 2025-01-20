@@ -25,9 +25,10 @@ namespace Graphics
     VertexIdentifier CreateVertexBuffer();
     void BindVertexBuffer(VertexIdentifier& vbo);
     void UnbindVertexBuffer();
-    void DeleteVertexBuffer(VertexIdentifier& vbo);
 
     VertexIdentifier CreateIndexBuffer();
     void BindIndexBuffer(VertexIdentifier& ebo);
     void UnbindIndexBuffer();
+
+    void DeleteBuffer(VertexIdentifier& buffer);
 }

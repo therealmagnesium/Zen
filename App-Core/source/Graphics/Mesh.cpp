@@ -1,5 +1,6 @@
 #include "Graphics/Mesh.h"
 #include "Graphics/Renderer.h"
+#include "Graphics/RenderCommand.h"
 
 #include "Core/Log.h"
 
@@ -14,22 +15,37 @@ namespace Graphics
     static const u32 MeshLoadFlags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices;
     static std::vector<Texture> loadedTextures;
 
-    static void SendDataToVertexArray(Mesh& mesh)
+    static void PrepareMesh(Mesh& mesh)
     {
+        mesh.vertexArray = CreateVertexArray();
+        mesh.vertexBuffer = CreateVertexBuffer();
+        mesh.indexBuffer = CreateIndexBuffer();
+
+        RenderCommand::SendDataToBuffer(mesh.vertexBuffer, BufferType::Array, mesh.vertices.data(),
+                                        mesh.vertexCount * sizeof(Vertex));
+
+        RenderCommand::SendDataToBuffer(mesh.indexBuffer, BufferType::ElementArray, mesh.indices.data(),
+                                        mesh.indexCount * sizeof(u32));
+
         BindVertexArray(mesh.vertexArray);
 
-        mesh.indexBuffer = Renderer->StoreIndexBuffer(mesh.indices.data(), mesh.indexCount);
-        Renderer->StoreDataInAttributeList(0, 3, mesh.vertices.data(), mesh.vertexCount, offsetof(Vertex, position));
-        Renderer->StoreDataInAttributeList(1, 2, mesh.vertices.data(), mesh.vertexCount, offsetof(Vertex, uvCoord));
-        Renderer->StoreDataInAttributeList(2, 3, mesh.vertices.data(), mesh.vertexCount, offsetof(Vertex, normal));
+        RenderCommand::SetAttributeLocation(mesh.vertexArray, 0, 3, sizeof(Vertex), offsetof(Vertex, position));
+        RenderCommand::SetAttributeLocation(mesh.vertexArray, 1, 2, sizeof(Vertex), offsetof(Vertex, uvCoord));
+        RenderCommand::SetAttributeLocation(mesh.vertexArray, 2, 3, sizeof(Vertex), offsetof(Vertex, normal));
 
         UnbindVertexArray();
+    }
+
+    static void FinishMesh(Mesh& mesh)
+    {
+        DeleteVertexArray(mesh.vertexArray);
+        DeleteBuffer(mesh.vertexBuffer);
+        DeleteBuffer(mesh.indexBuffer);
     }
 
     Mesh CreateMesh(Vertex* vertices, u32 vertexCount, u32* indices, u32 indexCount)
     {
         Mesh mesh;
-        mesh.vertexArray = CreateVertexArray();
         mesh.vertexCount = vertexCount;
         mesh.indexCount = indexCount;
         mesh.vertices.resize(vertexCount);
@@ -41,7 +57,7 @@ namespace Graphics
         for (u32 i = 0; i < indexCount; i++)
             mesh.indices[i] = indices[i];
 
-        SendDataToVertexArray(mesh);
+        PrepareMesh(mesh);
 
         return mesh;
     }
@@ -128,7 +144,7 @@ namespace Graphics
         if (aMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == AI_SUCCESS)
             mesh.material.diffuse = glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b);
 
-        SendDataToVertexArray(mesh);
+        PrepareMesh(mesh);
 
         return mesh;
     }
@@ -139,6 +155,8 @@ namespace Graphics
         mesh.indexCount = 0;
         mesh.vertices.clear();
         mesh.indices.clear();
+
+        FinishMesh(mesh);
         UnloadTexture(mesh.material.diffuseMap);
     }
 }

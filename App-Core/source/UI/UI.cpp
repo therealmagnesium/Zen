@@ -51,7 +51,7 @@ namespace UI
         ImGui_ImplSDL2_InitForOpenGL(window.handle, window.context);
         ImGui_ImplOpenGL3_Init("#version 450");
 
-        INFO("Succesfully initialized the UI context!");
+        INFO("Succesfully initialized the UI context");
     }
 
     void DestroyContext()
