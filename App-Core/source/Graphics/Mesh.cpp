@@ -15,11 +15,14 @@ namespace Graphics
     static const u32 MeshLoadFlags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices;
     static std::vector<Texture> loadedTextures;
 
-    static void PrepareMesh(Mesh& mesh)
+    static void UploadMeshData(Mesh& mesh)
     {
         mesh.vertexArray = CreateVertexArray();
         mesh.vertexBuffer = CreateVertexBuffer();
         mesh.indexBuffer = CreateIndexBuffer();
+
+        BindVertexBuffer(mesh.vertexBuffer);
+        BindIndexBuffer(mesh.indexBuffer);
 
         RenderCommand::SendDataToBuffer(mesh.vertexBuffer, BufferType::Array, mesh.vertices.data(),
                                         mesh.vertexCount * sizeof(Vertex));
@@ -27,16 +30,21 @@ namespace Graphics
         RenderCommand::SendDataToBuffer(mesh.indexBuffer, BufferType::ElementArray, mesh.indices.data(),
                                         mesh.indexCount * sizeof(u32));
 
+        UnbindVertexBuffer();
+        UnbindIndexBuffer();
+
         BindVertexArray(mesh.vertexArray);
+        BindVertexBuffer(mesh.vertexBuffer);
 
         RenderCommand::SetAttributeLocation(mesh.vertexArray, 0, 3, sizeof(Vertex), offsetof(Vertex, position));
         RenderCommand::SetAttributeLocation(mesh.vertexArray, 1, 2, sizeof(Vertex), offsetof(Vertex, uvCoord));
         RenderCommand::SetAttributeLocation(mesh.vertexArray, 2, 3, sizeof(Vertex), offsetof(Vertex, normal));
 
         UnbindVertexArray();
+        UnbindVertexBuffer();
     }
 
-    static void FinishMesh(Mesh& mesh)
+    static void DeleteMeshData(Mesh& mesh)
     {
         DeleteVertexArray(mesh.vertexArray);
         DeleteBuffer(mesh.vertexBuffer);
@@ -57,7 +65,7 @@ namespace Graphics
         for (u32 i = 0; i < indexCount; i++)
             mesh.indices[i] = indices[i];
 
-        PrepareMesh(mesh);
+        UploadMeshData(mesh);
 
         return mesh;
     }
@@ -144,7 +152,7 @@ namespace Graphics
         if (aMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == AI_SUCCESS)
             mesh.material.diffuse = glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b);
 
-        PrepareMesh(mesh);
+        UploadMeshData(mesh);
 
         return mesh;
     }
@@ -156,7 +164,7 @@ namespace Graphics
         mesh.vertices.clear();
         mesh.indices.clear();
 
-        FinishMesh(mesh);
+        DeleteMeshData(mesh);
         UnloadTexture(mesh.material.diffuseMap);
     }
 }

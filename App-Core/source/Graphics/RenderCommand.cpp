@@ -25,22 +25,11 @@ namespace Graphics
 
         void SendDataToBuffer(VertexIdentifier& buffer, BufferType type, void* data, u64 size)
         {
-            if (!buffer.isSelected)
+            if (buffer.isSelected)
             {
-                switch (type)
-                {
-                    case BufferType::Array:
-                        BindVertexBuffer(buffer);
-                        break;
-
-                    case BufferType::ElementArray:
-                        BindIndexBuffer(buffer);
-                        break;
-                }
+                u32 glBufferType = BufferTypeToGL(type);
+                glBufferData(glBufferType, size, data, GL_STATIC_DRAW);
             }
-
-            u32 glBufferType = BufferTypeToGL(type);
-            glBufferData(glBufferType, size, data, GL_STATIC_DRAW);
         }
 
         void SetAttributeLocation(VertexIdentifier& vao, u8 location, u8 numComponents, u64 stride, u64 offset)
