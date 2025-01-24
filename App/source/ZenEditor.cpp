@@ -8,22 +8,25 @@
 
 static Mesh roomMesh;
 static Mesh miiMesh;
+static Mesh xbotMesh;
 
 static Shader postProcessingShader;
 static Shader instancingShader;
 
 ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
 {
-    roomMesh = LoadMesh("assets/models/room.fbx");
-    miiMesh = LoadMesh("assets/models/mii.fbx");
+    roomMesh = LoadMesh("assets/models/collectable.glb");
+    miiMesh = LoadMesh("assets/models/cube.glb");
+    xbotMesh = LoadMesh("assets/models/xbot.fbx");
 
-    m_directionalLight.intensity = 1.5f;
+    m_directionalLight.intensity = 5.f;
     m_directionalLight.direction = glm::vec3(0.2f, -0.86f, -0.95f);
 
     postProcessingShader = LoadShader("assets/shaders/PostProcessing_vs.glsl", "assets/shaders/PostProcessing_fs.glsl");
     postProcessingShader.CreateUniform("screenTexture");
     postProcessingShader.CreateUniform("projectionMatrix");
     postProcessingShader.CreateUniform("gamma");
+    postProcessingShader.CreateUniform("exposure");
 
     instancingShader = LoadShader("assets/shaders/Instancing_vs.glsl", "assets/shaders/Default_fs.glsl");
     instancingShader.CreateMaterialUniform("material");
@@ -44,8 +47,8 @@ ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
         position.z = rand() % 100 - 50;
 
         std::shared_ptr<Entity>& entity = m_boxes[i];
-        entity = m_entityManager.AddEntity("Box");
-        entity->AddComponent<TransformComponent>(position, glm::vec3(0.f), glm::vec3(0.4f));
+        entity = m_entityManager.AddEntity("Room");
+        entity->AddComponent<TransformComponent>(position, glm::vec3(0.f), glm::vec3(1.f));
         entity->AddComponent<MeshComponent>(&roomMesh);
     }
 
@@ -72,6 +75,7 @@ void ZenEditor::OnShutdown()
 
     UnloadMesh(roomMesh);
     UnloadMesh(miiMesh);
+    UnloadMesh(xbotMesh);
 }
 
 void ZenEditor::OnUpdate()

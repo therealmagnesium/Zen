@@ -6,12 +6,15 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
-Graphics::Shader* SceneViewportPanel::s_postProcessingShader = NULL;
+using namespace Core;
+using namespace Graphics;
+
+Shader* SceneViewportPanel::s_postProcessingShader = NULL;
 float SceneViewportPanel::s_gammaCorrection = 2.2f;
 
 void SceneViewportPanel::Display()
 {
-    Graphics::Framebuffer& framebuffer = Core::App->GetFramebuffer();
+    Framebuffer& framebuffer = App->GetFramebuffer();
     u64 displayTexture = framebuffer.colorAttachment.id;
 
     ImGui::Begin("Scene Viewport");
@@ -25,7 +28,7 @@ void SceneViewportPanel::Display()
 
 void SceneViewportPanel::DrawCallback(const ImDrawList*, const ImDrawCmd*)
 {
-    Graphics::Framebuffer& framebuffer = Core::App->GetFramebuffer();
+    Framebuffer& framebuffer = App->GetFramebuffer();
 
     ImDrawData* draw_data = ImGui::GetDrawData();
     float L = draw_data->DisplayPos.x;
@@ -43,5 +46,6 @@ void SceneViewportPanel::DrawCallback(const ImDrawList*, const ImDrawCmd*)
         s_postProcessingShader->SetInt("screenTexture", 0);
         s_postProcessingShader->SetMat4("projectionMatrix", projection);
         s_postProcessingShader->SetFloat("gamma", s_gammaCorrection);
+        s_postProcessingShader->SetFloat("exposure", Renderer->GetExposure());
     }
 }

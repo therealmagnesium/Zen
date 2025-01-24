@@ -21,9 +21,11 @@ namespace Graphics
     public:
         RenderManager() = default;
 
+        inline float GetExposure() const { return m_exposure; }
         inline glm::mat4& GetProjection() { return m_projection; }
         inline Camera* GetPrimaryCamera() const { return m_primaryCamera; }
 
+        inline void SetExposure(float exposure) { m_exposure = exposure; }
         inline void SetClearColor(float r, float g, float b) { m_clearColor = glm::vec3(r, g, b); }
         inline void SetPrimaryCamera(Camera* camera) { m_primaryCamera = camera; }
 
@@ -50,8 +52,9 @@ namespace Graphics
     private:
         Camera* m_primaryCamera = NULL;
 
-        glm::vec3 m_clearColor;
-        glm::mat4 m_projection;
+        float m_exposure = 1.f;
+        glm::vec3 m_clearColor = glm::vec3(1.f);
+        glm::mat4 m_projection = glm::mat4(1.f);
 
         std::unordered_map<Mesh*, std::vector<glm::mat4>> m_meshTransformsMap;
         std::unordered_map<Mesh*, std::vector<std::shared_ptr<Core::Entity>>> m_meshEntitiesMap;

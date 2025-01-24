@@ -10,6 +10,7 @@ namespace Graphics
     {
         None = 0,
         RGB,
+        RGB16F,
         RGBA,
         R,
         DepthStencil

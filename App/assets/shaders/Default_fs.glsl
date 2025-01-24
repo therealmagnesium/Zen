@@ -62,11 +62,8 @@ vec3 LinearizeDepth(float depth)
 void main()
 {
     vec3 normal = normalize(fragNormal);
-    vec3 objectColor = GetObjectColor();
-    
-    vec3 result = vec3(0.f);
-    result += CalculateDirectionalLighting(normal);
-    result *= objectColor;
+    vec3 objectColor = GetObjectColor(); 
+    vec3 result = CalculateDirectionalLighting(normal) * objectColor;
 
     finalColor = vec4(result, 1.f);
 }

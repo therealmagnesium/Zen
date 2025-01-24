@@ -16,6 +16,10 @@ namespace Graphics
                 internalFormat = (!isEmptyTexture) ? GL_SRGB : GL_RGB;
                 break;
 
+            case TextureFormat::RGB16F:
+                internalFormat = GL_RGB16F;
+                break;
+
             case TextureFormat::RGBA:
                 internalFormat = (!isEmptyTexture) ? GL_SRGB_ALPHA : GL_RGBA;
                 break;
@@ -37,6 +41,10 @@ namespace Graphics
         switch (format)
         {
             case TextureFormat::RGB:
+                glFormat = GL_RGB;
+                break;
+
+            case TextureFormat::RGB16F:
                 glFormat = GL_RGB;
                 break;
 
@@ -67,6 +75,10 @@ namespace Graphics
         {
             case TextureFormat::RGB:
                 dataType = GL_UNSIGNED_BYTE;
+                break;
+
+            case TextureFormat::RGB16F:
+                dataType = GL_FLOAT;
                 break;
 
             case TextureFormat::RGBA:

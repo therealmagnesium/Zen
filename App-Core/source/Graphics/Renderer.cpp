@@ -39,8 +39,6 @@ namespace Graphics
             return;
         }
 
-        m_projection = glm::mat4(1.f);
-
         Renderer = this;
         isInitialized = true;
 

@@ -7,7 +7,7 @@ namespace Graphics
     Framebuffer CreateFramebuffer(u32 width, u32 height)
     {
         Framebuffer framebuffer;
-        framebuffer.colorAttachment = CreateEmptyTexture(width, height, TextureFormat::RGB);
+        framebuffer.colorAttachment = CreateEmptyTexture(width, height, TextureFormat::RGB16F);
         framebuffer.depthAttachment = CreateEmptyTexture(width, height, TextureFormat::DepthStencil);
 
         glGenFramebuffers(1, &framebuffer.id);
