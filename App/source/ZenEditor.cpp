@@ -14,6 +14,8 @@ static Shader postProcessingShader;
 ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
 {
     roomMesh = LoadMesh("assets/models/room.fbx");
+    roomMesh.shouldCullBackface = false;
+
     miiMesh = LoadMesh("assets/models/mii.fbx");
 
     m_directionalLight.intensity = 1.5f;
@@ -37,11 +39,15 @@ ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
 
     m_room = m_entityManager.AddEntity("Room");
     m_room->AddComponent<TransformComponent>();
-    m_room->AddComponent<MeshComponent>(roomMesh);
+    m_room->AddComponent<MeshComponent>(&roomMesh);
 
     m_mii = m_entityManager.AddEntity("Mii");
     m_mii->AddComponent<TransformComponent>();
-    m_mii->AddComponent<MeshComponent>(miiMesh);
+    m_mii->AddComponent<MeshComponent>(&miiMesh);
+
+    m_mii2 = m_entityManager.AddEntity("Mii 2");
+    m_mii2->AddComponent<TransformComponent>(glm::vec3(-2.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f));
+    m_mii2->AddComponent<MeshComponent>(&miiMesh);
 
     SceneViewportPanel::SetPostFXShader(postProcessingShader);
 }
@@ -72,11 +78,10 @@ void ZenEditor::OnRender()
 
     Renderer->Prepare(m_directionalLight, phongShader);
 
-    Renderer->CullFace(FaceCull::Front);
-    Renderer->DrawEntity(m_room, phongShader);
+    for (auto& entity : m_entityManager.GetEntities())
+        Renderer->ProcessEntity(entity);
 
-    Renderer->CullFace(FaceCull::Back);
-    Renderer->DrawEntity(m_mii, phongShader);
+    Renderer->DrawEntities(phongShader);
 
     UnbindShader();
 }

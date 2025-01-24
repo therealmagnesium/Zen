@@ -85,6 +85,28 @@ namespace Graphics
         glCullFace(glCull);
     }
 
+    void RenderManager::ProcessEntity(std::shared_ptr<Core::Entity>& entity)
+    {
+        if (entity->HasComponent<Core::MeshComponent>())
+        {
+            auto& mc = entity->GetComponent<Core::MeshComponent>();
+
+            if (mc.mesh != NULL)
+            {
+                std::vector<std::shared_ptr<Core::Entity>>& batch = m_meshEntitiesMap[mc.mesh];
+
+                if (batch.size() != 0)
+                    batch.push_back(entity);
+                else
+                {
+                    std::vector<std::shared_ptr<Core::Entity>> newBatch;
+                    newBatch.push_back(entity);
+                    m_meshEntitiesMap[mc.mesh] = newBatch;
+                }
+            }
+        }
+    }
+
     void RenderManager::Prepare(DirectionalLight& directionalLight, Shader& shader)
     {
         if (m_primaryCamera != NULL)
@@ -95,35 +117,69 @@ namespace Graphics
         }
     }
 
-    void RenderManager::DrawEntity(std::shared_ptr<Core::Entity>& entity, Shader& shader)
+    void RenderManager::DrawEntities(Shader& shader)
     {
-        if (m_primaryCamera != NULL && entity->HasComponent<Core::MeshComponent>())
+        if (m_primaryCamera != NULL)
         {
-            auto& tc = entity->GetComponent<Core::TransformComponent>();
-            auto& mc = entity->GetComponent<Core::MeshComponent>();
-            glm::mat4 normalMatrix = glm::transpose(glm::inverse(tc.transform));
+            Renderer->CullFace(FaceCull::Back);
 
-            shader.SetMat4("transformMatrix", tc.transform);
-            shader.SetMat4("normalMatrix", normalMatrix);
-            shader.SetMaterial("material", mc.mesh.material);
+            for (auto& [mesh, entities] : m_meshEntitiesMap)
+            {
+                if (mesh != NULL)
+                {
+                    if (!mesh->shouldCullBackface)
+                        Renderer->CullFace(FaceCull::Front);
 
-            BindTexture(mc.mesh.material.diffuseMap, 0);
-            BindVertexArray(mc.mesh.vertexArray);
-            BindIndexBuffer(mc.mesh.indexBuffer);
+                    PrepareMesh(mesh, shader);
+                    std::vector<std::shared_ptr<Core::Entity>>& batch = m_meshEntitiesMap[mesh];
+
+                    for (auto& entity : batch)
+                    {
+                        PrepareEntity(entity, shader);
+                        glDrawElements(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, NULL);
+                    }
+
+                    UnprepareMesh();
+                }
+            }
+        }
+
+        m_meshEntitiesMap.clear();
+    }
+
+    void RenderManager::PrepareMesh(Mesh* mesh, Shader& shader)
+    {
+        if (mesh != NULL)
+        {
+            BindVertexArray(mesh->vertexArray);
+            BindIndexBuffer(mesh->indexBuffer);
+            BindTexture(mesh->material.diffuseMap, 0);
+
+            shader.SetMaterial("material", mesh->material);
 
             glEnableVertexAttribArray(0);
             glEnableVertexAttribArray(1);
             glEnableVertexAttribArray(2);
-
-            glDrawElements(GL_TRIANGLES, mc.mesh.indexCount, GL_UNSIGNED_INT, NULL);
-
-            glDisableVertexAttribArray(0);
-            glDisableVertexAttribArray(1);
-            glDisableVertexAttribArray(2);
-
-            UnbindIndexBuffer();
-            UnbindVertexArray();
-            UnbindTexture();
         }
+    }
+
+    void RenderManager::UnprepareMesh()
+    {
+        glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(2);
+
+        UnbindIndexBuffer();
+        UnbindVertexArray();
+        UnbindTexture();
+    }
+
+    void RenderManager::PrepareEntity(std::shared_ptr<Core::Entity>& entity, Shader& shader)
+    {
+        auto& tc = entity->GetComponent<Core::TransformComponent>();
+        glm::mat4 normalMatrix = glm::transpose(glm::inverse(tc.transform));
+
+        shader.SetMat4("transformMatrix", tc.transform);
+        shader.SetMat4("normalMatrix", normalMatrix);
     }
 }

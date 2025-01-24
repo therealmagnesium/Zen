@@ -16,6 +16,7 @@ namespace Graphics
         Material material;
         u32 vertexCount = 0;
         u32 indexCount = 0;
+        bool shouldCullBackface = true;
         std::vector<Vertex> vertices;
         std::vector<u32> indices;
     };

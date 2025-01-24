@@ -25,4 +25,5 @@ private:
 
     std::shared_ptr<Entity> m_room;
     std::shared_ptr<Entity> m_mii;
+    std::shared_ptr<Entity> m_mii2;
 };

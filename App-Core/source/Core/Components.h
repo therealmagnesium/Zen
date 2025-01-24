@@ -30,14 +30,23 @@ namespace Core
             this->rotation = rotation;
             this->scale = scale;
         }
+
+        TransformComponent(const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale)
+        {
+            transform = glm::mat4(1.f);
+
+            this->position = position;
+            this->rotation = rotation;
+            this->scale = scale;
+        }
     };
 
     struct MeshComponent
     {
         bool isEnabled = false;
-        Graphics::Mesh mesh;
+        Graphics::Mesh* mesh = NULL;
 
         MeshComponent() = default;
-        MeshComponent(Graphics::Mesh& mesh) { this->mesh = mesh; };
+        MeshComponent(Graphics::Mesh* mesh) { this->mesh = mesh; };
     };
 }

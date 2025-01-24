@@ -38,14 +38,24 @@ namespace Graphics
         void Clear();
         void CullFace(FaceCull cull);
 
+        void ProcessEntity(std::shared_ptr<Core::Entity>& entity);
+
         void Prepare(DirectionalLight& directionalLight, Shader& shader);
-        void DrawEntity(std::shared_ptr<Core::Entity>& entity, Shader& shader);
+        void DrawEntities(Shader& shader);
+
+    private:
+        void PrepareMesh(Mesh* mesh, Shader& shader);
+        void UnprepareMesh();
+        void PrepareEntity(std::shared_ptr<Core::Entity>& entity, Shader& shader);
 
     private:
         Camera* m_primaryCamera = NULL;
 
         glm::vec3 m_clearColor;
         glm::mat4 m_projection;
+
+        // std::unordered_map<Mesh*, std::vector<glm::mat4>> meshTransformsMap;
+        std::unordered_map<Mesh*, std::vector<std::shared_ptr<Core::Entity>>> m_meshEntitiesMap;
     };
 
     extern RenderManager* Renderer;
