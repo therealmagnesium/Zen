@@ -19,6 +19,7 @@ namespace Graphics
     {
         mesh.vertexArray = CreateVertexArray();
         mesh.vertexBuffer = CreateVertexBuffer();
+        mesh.instanceBuffer = CreateVertexBuffer();
         mesh.indexBuffer = CreateIndexBuffer();
 
         BindVertexBuffer(mesh.vertexBuffer);
@@ -48,6 +49,7 @@ namespace Graphics
     {
         DeleteVertexArray(mesh.vertexArray);
         DeleteBuffer(mesh.vertexBuffer);
+        DeleteBuffer(mesh.instanceBuffer);
         DeleteBuffer(mesh.indexBuffer);
     }
 

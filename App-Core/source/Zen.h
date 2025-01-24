@@ -11,6 +11,7 @@
 #include "Core/Time.h"
 
 #include "Graphics/Camera.h"
+#include "Graphics/Framebuffer.h"
 #include "Graphics/Lights.h"
 #include "Graphics/Material.h"
 #include "Graphics/Mesh.h"
@@ -18,3 +19,5 @@
 #include "Graphics/Shader.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Window.h"
+
+#include "UI/UI.h"

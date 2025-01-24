@@ -6,6 +6,7 @@
 #include "UI/UI.h"
 
 #include <glad/glad.h>
+#include <time.h>
 
 namespace Core
 {
@@ -19,6 +20,8 @@ namespace Core
             WARN("Can't initialize application more than once...");
             return;
         }
+
+        srand(time(NULL));
 
         App = this;
         isInitialized = true;

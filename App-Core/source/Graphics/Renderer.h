@@ -46,7 +46,6 @@ namespace Graphics
     private:
         void PrepareMesh(Mesh* mesh, Shader& shader);
         void UnprepareMesh();
-        void PrepareEntity(std::shared_ptr<Core::Entity>& entity, Shader& shader);
 
     private:
         Camera* m_primaryCamera = NULL;
@@ -54,7 +53,7 @@ namespace Graphics
         glm::vec3 m_clearColor;
         glm::mat4 m_projection;
 
-        // std::unordered_map<Mesh*, std::vector<glm::mat4>> meshTransformsMap;
+        std::unordered_map<Mesh*, std::vector<glm::mat4>> m_meshTransformsMap;
         std::unordered_map<Mesh*, std::vector<std::shared_ptr<Core::Entity>>> m_meshEntitiesMap;
     };
 

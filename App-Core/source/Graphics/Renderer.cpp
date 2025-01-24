@@ -1,6 +1,7 @@
 #include "Graphics/Renderer.h"
 #include "Core/Application.h"
 #include "Core/Log.h"
+#include "Graphics/RenderCommand.h"
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -89,11 +90,14 @@ namespace Graphics
     {
         if (entity->HasComponent<Core::MeshComponent>())
         {
+            auto& tc = entity->GetComponent<Core::TransformComponent>();
             auto& mc = entity->GetComponent<Core::MeshComponent>();
 
             if (mc.mesh != NULL)
             {
                 std::vector<std::shared_ptr<Core::Entity>>& batch = m_meshEntitiesMap[mc.mesh];
+                std::vector<glm::mat4>& transformsBatch = m_meshTransformsMap[mc.mesh];
+                mc.mesh->normalMatrix = glm::transpose(glm::inverse(tc.transform));
 
                 if (batch.size() != 0)
                     batch.push_back(entity);
@@ -102,6 +106,15 @@ namespace Graphics
                     std::vector<std::shared_ptr<Core::Entity>> newBatch;
                     newBatch.push_back(entity);
                     m_meshEntitiesMap[mc.mesh] = newBatch;
+                }
+
+                if (transformsBatch.size() != 0)
+                    transformsBatch.push_back(tc.transform);
+                else
+                {
+                    std::vector<glm::mat4> newBatch;
+                    newBatch.push_back(tc.transform);
+                    m_meshTransformsMap[mc.mesh] = newBatch;
                 }
             }
         }
@@ -131,13 +144,9 @@ namespace Graphics
                         Renderer->CullFace(FaceCull::Front);
 
                     PrepareMesh(mesh, shader);
-                    std::vector<std::shared_ptr<Core::Entity>>& batch = m_meshEntitiesMap[mesh];
 
-                    for (auto& entity : batch)
-                    {
-                        PrepareEntity(entity, shader);
-                        glDrawElements(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, NULL);
-                    }
+                    glDrawElementsInstanced(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, NULL,
+                                            m_meshTransformsMap[mesh].size());
 
                     UnprepareMesh();
                 }
@@ -145,21 +154,50 @@ namespace Graphics
         }
 
         m_meshEntitiesMap.clear();
+        m_meshTransformsMap.clear();
     }
 
     void RenderManager::PrepareMesh(Mesh* mesh, Shader& shader)
     {
         if (mesh != NULL)
         {
+            std::vector<glm::mat4>& batch = m_meshTransformsMap[mesh];
+
+            BindVertexBuffer(mesh->instanceBuffer);
+
+            RenderCommand::SendDataToBuffer(mesh->instanceBuffer, BufferType::Array, batch.data(),
+                                            batch.size() * sizeof(glm::mat4));
+
+            BindVertexArray(mesh->vertexArray);
+
+            RenderCommand::SetAttributeLocation(mesh->vertexArray, 3, 4, 4 * sizeof(glm::vec4), 0 * sizeof(glm::vec4));
+            RenderCommand::SetAttributeLocation(mesh->vertexArray, 4, 4, 4 * sizeof(glm::vec4), 1 * sizeof(glm::vec4));
+            RenderCommand::SetAttributeLocation(mesh->vertexArray, 5, 4, 4 * sizeof(glm::vec4), 2 * sizeof(glm::vec4));
+            RenderCommand::SetAttributeLocation(mesh->vertexArray, 6, 4, 4 * sizeof(glm::vec4), 3 * sizeof(glm::vec4));
+
+            glVertexAttribDivisor(3, 1);
+            glVertexAttribDivisor(4, 1);
+            glVertexAttribDivisor(5, 1);
+            glVertexAttribDivisor(6, 1);
+
+            UnbindVertexArray();
+
+            UnbindVertexBuffer();
+
             BindVertexArray(mesh->vertexArray);
             BindIndexBuffer(mesh->indexBuffer);
             BindTexture(mesh->material.diffuseMap, 0);
 
+            shader.SetMat4("normalMatrix", mesh->normalMatrix);
             shader.SetMaterial("material", mesh->material);
 
             glEnableVertexAttribArray(0);
             glEnableVertexAttribArray(1);
             glEnableVertexAttribArray(2);
+            glEnableVertexAttribArray(3);
+            glEnableVertexAttribArray(4);
+            glEnableVertexAttribArray(5);
+            glEnableVertexAttribArray(6);
         }
     }
 
@@ -168,18 +206,13 @@ namespace Graphics
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
         glDisableVertexAttribArray(2);
+        glDisableVertexAttribArray(3);
+        glDisableVertexAttribArray(4);
+        glDisableVertexAttribArray(5);
+        glDisableVertexAttribArray(6);
 
         UnbindIndexBuffer();
         UnbindVertexArray();
         UnbindTexture();
-    }
-
-    void RenderManager::PrepareEntity(std::shared_ptr<Core::Entity>& entity, Shader& shader)
-    {
-        auto& tc = entity->GetComponent<Core::TransformComponent>();
-        glm::mat4 normalMatrix = glm::transpose(glm::inverse(tc.transform));
-
-        shader.SetMat4("transformMatrix", tc.transform);
-        shader.SetMat4("normalMatrix", normalMatrix);
     }
 }

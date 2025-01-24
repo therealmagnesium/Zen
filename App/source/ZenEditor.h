@@ -23,7 +23,6 @@ private:
     EntityManager m_entityManager;
     SceneViewportPanel m_sceneViewportPanel;
 
-    std::shared_ptr<Entity> m_room;
-    std::shared_ptr<Entity> m_mii;
-    std::shared_ptr<Entity> m_mii2;
+    std::shared_ptr<Entity> m_boxes[100];
+    std::shared_ptr<Entity> m_miis[100];
 };
