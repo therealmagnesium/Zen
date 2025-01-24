@@ -6,7 +6,8 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
-Graphics::Shader SceneViewportPanel::postProcessingShader;
+Graphics::Shader* SceneViewportPanel::s_postProcessingShader = NULL;
+float SceneViewportPanel::s_gammaCorrection = 2.2f;
 
 void SceneViewportPanel::Display()
 {
@@ -34,8 +35,13 @@ void SceneViewportPanel::DrawCallback(const ImDrawList*, const ImDrawCmd*)
 
     glm::mat4 projection = glm::ortho(L, R, B, T);
 
-    BindShader(postProcessingShader);
-    glActiveTexture(GL_TEXTURE0 + framebuffer.colorAttachment.id);
-    postProcessingShader.SetInt("screenTexture", framebuffer.colorAttachment.id);
-    postProcessingShader.SetMat4("projectionMatrix", projection);
+    if (s_postProcessingShader != NULL)
+    {
+        BindShader(*s_postProcessingShader);
+        BindTexture(framebuffer.colorAttachment, 0);
+
+        s_postProcessingShader->SetInt("screenTexture", 0);
+        s_postProcessingShader->SetMat4("projectionMatrix", projection);
+        s_postProcessingShader->SetFloat("gamma", s_gammaCorrection);
+    }
 }

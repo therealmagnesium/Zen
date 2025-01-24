@@ -6,18 +6,18 @@
 
 namespace Graphics
 {
-    static u32 GetInternalFormat(TextureFormat format)
+    static u32 GetInternalFormat(TextureFormat format, bool isEmptyTexture)
     {
         u32 internalFormat = 0;
 
         switch (format)
         {
             case TextureFormat::RGB:
-                internalFormat = GL_RGB;
+                internalFormat = (!isEmptyTexture) ? GL_SRGB : GL_RGB;
                 break;
 
             case TextureFormat::RGBA:
-                internalFormat = GL_RGBA;
+                internalFormat = (!isEmptyTexture) ? GL_SRGB_ALPHA : GL_RGBA;
                 break;
 
             case TextureFormat::DepthStencil:
@@ -29,6 +29,34 @@ namespace Graphics
         }
 
         return internalFormat;
+    }
+
+    static u32 GetGLFormat(TextureFormat format)
+    {
+        u32 glFormat = 0;
+        switch (format)
+        {
+            case TextureFormat::RGB:
+                glFormat = GL_RGB;
+                break;
+
+            case TextureFormat::RGBA:
+                glFormat = GL_RGBA;
+                break;
+
+            case TextureFormat::R:
+                glFormat = GL_RED;
+                break;
+
+            case TextureFormat::DepthStencil:
+                glFormat = GL_DEPTH_STENCIL;
+                break;
+
+            default:
+                break;
+        }
+
+        return glFormat;
     }
 
     static u32 GetDataType(TextureFormat format)
@@ -71,10 +99,10 @@ namespace Graphics
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        u32 internalFormat = GetInternalFormat(texture.format);
+        u32 glFormat = GetGLFormat(texture.format);
+        u32 internalFormat = GetInternalFormat(texture.format, true);
         u32 dataType = GetDataType(texture.format);
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, texture.width, texture.height, 0, (u32)texture.format,
-                     (u32)dataType, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, texture.width, texture.height, 0, glFormat, dataType, NULL);
 
         glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -104,9 +132,10 @@ namespace Graphics
             return (Texture){.isValid = false};
         }
 
-        u32 internalFormat = GetInternalFormat(texture.format);
+        u32 glFormat = GetGLFormat(texture.format);
+        u32 internalFormat = GetInternalFormat(texture.format, false);
         u32 dataType = GetDataType(texture.format);
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, texture.width, texture.height, 0, (u32)texture.format, dataType,
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, texture.width, texture.height, 0, glFormat, dataType,
                      texture.data);
 
         glGenerateMipmap(GL_TEXTURE_2D);

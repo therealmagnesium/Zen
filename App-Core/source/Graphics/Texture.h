@@ -9,10 +9,10 @@ namespace Graphics
     enum class TextureFormat
     {
         None = 0,
-        RGB = GL_RGB,
-        RGBA = GL_RGBA,
-        R = GL_R8,
-        DepthStencil = GL_DEPTH_STENCIL
+        RGB,
+        RGBA,
+        R,
+        DepthStencil
     };
 
     struct Texture

@@ -23,6 +23,7 @@ ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
     postProcessingShader = LoadShader("assets/shaders/PostProcessing_vs.glsl", "assets/shaders/PostProcessing_fs.glsl");
     postProcessingShader.CreateUniform("screenTexture");
     postProcessingShader.CreateUniform("projectionMatrix");
+    postProcessingShader.CreateUniform("gamma");
 
     instancingShader = LoadShader("assets/shaders/Instancing_vs.glsl", "assets/shaders/Default_fs.glsl");
     instancingShader.CreateMaterialUniform("material");
@@ -61,7 +62,7 @@ ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
         entity->AddComponent<MeshComponent>(&miiMesh);
     }
 
-    SceneViewportPanel::SetPostFXShader(postProcessingShader);
+    SceneViewportPanel::SetPostFXShader(&postProcessingShader);
 }
 
 void ZenEditor::OnShutdown()

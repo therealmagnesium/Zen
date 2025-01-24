@@ -76,7 +76,7 @@ namespace Graphics
 
     void RenderManager::Clear()
     {
-        glClearColor(V3_OPEN(m_clearColor), 1.f);
+        glClearColor(pow(m_clearColor.x, 2.2f), pow(m_clearColor.y, 2.2f), pow(m_clearColor.z, 2.2f), 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
