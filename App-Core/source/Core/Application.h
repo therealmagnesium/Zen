@@ -25,7 +25,6 @@ namespace Core
         virtual ~Application();
 
         inline bool IsRunning() const { return m_isRunning; }
-        inline Graphics::Framebuffer& GetFramebuffer() { return m_framebuffer; }
         inline Graphics::Window& GetWindow() { return m_window; }
         inline ApplicationSpecification& GetSpecification() { return m_specification; }
 
@@ -41,7 +40,6 @@ namespace Core
     private:
         bool m_isRunning = false;
         ApplicationSpecification m_specification;
-        Graphics::Framebuffer m_framebuffer;
         Graphics::RenderManager m_renderer;
         Graphics::Window m_window;
     };

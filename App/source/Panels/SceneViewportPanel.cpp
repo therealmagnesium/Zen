@@ -10,12 +10,14 @@ using namespace Core;
 using namespace Graphics;
 
 Shader* SceneViewportPanel::s_postProcessingShader = NULL;
+Framebuffer* SceneViewportPanel::s_framebuffer = NULL;
 float SceneViewportPanel::s_gammaCorrection = 2.2f;
 
-void SceneViewportPanel::Display()
+void SceneViewportPanel::Display(Framebuffer& framebuffer)
 {
-    Framebuffer& framebuffer = App->GetFramebuffer();
-    u64 displayTexture = framebuffer.colorAttachment.id;
+    s_framebuffer = &framebuffer;
+
+    u64 displayTexture = framebuffer.attachments[0].id;
 
     ImGui::Begin("Scene Viewport");
     {
@@ -28,8 +30,6 @@ void SceneViewportPanel::Display()
 
 void SceneViewportPanel::DrawCallback(const ImDrawList*, const ImDrawCmd*)
 {
-    Framebuffer& framebuffer = App->GetFramebuffer();
-
     ImDrawData* draw_data = ImGui::GetDrawData();
     float L = draw_data->DisplayPos.x;
     float R = draw_data->DisplayPos.x + draw_data->DisplaySize.x;
@@ -41,7 +41,7 @@ void SceneViewportPanel::DrawCallback(const ImDrawList*, const ImDrawCmd*)
     if (s_postProcessingShader != NULL)
     {
         BindShader(*s_postProcessingShader);
-        BindTexture(framebuffer.colorAttachment, 0);
+        BindTexture(s_framebuffer->attachments[0], 0);
 
         s_postProcessingShader->SetInt("screenTexture", 0);
         s_postProcessingShader->SetMat4("projectionMatrix", projection);

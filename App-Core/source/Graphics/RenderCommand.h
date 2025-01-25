@@ -1,5 +1,6 @@
 #pragma once
 #include "Graphics/RendererInternal.h"
+#include "Graphics/Framebuffer.h"
 
 namespace Graphics
 {
@@ -13,5 +14,6 @@ namespace Graphics
     {
         void SendDataToBuffer(VertexIdentifier& buffer, BufferType type, void* data, u64 size);
         void SetAttributeLocation(VertexIdentifier& vao, u8 location, u8 numComponents, u64 stride, u64 offset);
+        void AttachToFramebuffer(Framebuffer& framebuffer, Texture& attachment, TextureFormat format);
     }
 }

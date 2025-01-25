@@ -1,28 +1,35 @@
 #include "Graphics/Framebuffer.h"
 #include "Graphics/Texture.h"
+#include "Graphics/RenderCommand.h"
+
 #include <glad/glad.h>
 
 namespace Graphics
 {
-    Framebuffer CreateFramebuffer(u32 width, u32 height)
+    Framebuffer CreateFramebuffer(u8 numAttachments)
     {
         Framebuffer framebuffer;
-        framebuffer.colorAttachment = CreateEmptyTexture(width, height, TextureFormat::RGB16F);
-        framebuffer.depthAttachment = CreateEmptyTexture(width, height, TextureFormat::DepthStencil);
-
+        framebuffer.attachments.resize(numAttachments);
         glGenFramebuffers(1, &framebuffer.id);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer.id);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer.colorAttachment.id, 0);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D,
-                               framebuffer.depthAttachment.id, 0);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
         return framebuffer;
+    }
+
+    void ApplyFramebufferAttachments(Framebuffer& framebuffer)
+    {
+        BindFramebuffer(framebuffer);
+
+        for (u32 i = 0; i < framebuffer.attachments.size(); i++)
+            RenderCommand::AttachToFramebuffer(framebuffer, framebuffer.attachments[i],
+                                               framebuffer.attachments[i].format);
+
+        UnbindFramebuffer();
     }
 
     void BindFramebuffer(Framebuffer& framebuffer)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer.id);
+        framebuffer.isSelected = true;
     }
 
     void UnbindFramebuffer()
@@ -30,9 +37,10 @@ namespace Graphics
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    void DestoryFramebuffer(Framebuffer& framebuffer)
+    void DestroyFramebuffer(Framebuffer& framebuffer)
     {
         glDeleteFramebuffers(1, &framebuffer.id);
+        framebuffer.isSelected = false;
     }
 
 }

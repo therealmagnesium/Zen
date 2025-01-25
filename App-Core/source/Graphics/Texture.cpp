@@ -24,6 +24,10 @@ namespace Graphics
                 internalFormat = (!isEmptyTexture) ? GL_SRGB_ALPHA : GL_RGBA;
                 break;
 
+            case TextureFormat::Depth:
+                internalFormat = GL_DEPTH_COMPONENT;
+                break;
+
             case TextureFormat::DepthStencil:
                 internalFormat = GL_DEPTH24_STENCIL8;
                 break;
@@ -56,6 +60,9 @@ namespace Graphics
                 glFormat = GL_RED;
                 break;
 
+            case TextureFormat::Depth:
+                glFormat = GL_DEPTH_COMPONENT;
+
             case TextureFormat::DepthStencil:
                 glFormat = GL_DEPTH_STENCIL;
                 break;
@@ -77,6 +84,7 @@ namespace Graphics
                 dataType = GL_UNSIGNED_BYTE;
                 break;
 
+            case TextureFormat::Depth:
             case TextureFormat::RGB16F:
                 dataType = GL_FLOAT;
                 break;

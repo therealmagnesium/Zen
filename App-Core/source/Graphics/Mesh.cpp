@@ -12,8 +12,7 @@
 
 namespace Graphics
 {
-    static const u32 MeshLoadFlags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices;
-    static std::vector<Texture> loadedTextures;
+    u32 Mesh::LoadFlags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices;
 
     static void UploadMeshData(Mesh& mesh)
     {
@@ -72,13 +71,13 @@ namespace Graphics
         return mesh;
     }
 
-    Mesh LoadMesh(const char* path)
+    Mesh LoadMesh(const char* path, Material* material)
     {
         Mesh mesh;
-        mesh.vertexArray = CreateVertexArray();
+        mesh.material = material;
 
         Assimp::Importer importer;
-        const aiScene* model = importer.ReadFile(path, MeshLoadFlags);
+        const aiScene* model = importer.ReadFile(path, Mesh::LoadFlags);
 
         if (model == NULL || model->mRootNode == NULL)
         {
@@ -125,35 +124,6 @@ namespace Graphics
         }
         mesh.indexCount = mesh.indices.size();
 
-        aiMaterial* aMaterial = model->mMaterials[aMesh->mMaterialIndex];
-
-        bool skipTextureLoad = false;
-        aiString aPath;
-        aMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &aPath);
-
-        // The texture has already been loaded, so don't load it again.
-        for (auto& texture : loadedTextures)
-        {
-            if (strcmp(texture.path.c_str(), aPath.C_Str()) == 0)
-            {
-                skipTextureLoad = true;
-                mesh.material.diffuseMap = texture;
-                break;
-            }
-        }
-
-        // The texture hasn't been loaded yet, so load it.
-        if (!skipTextureLoad && aPath.length > 3)
-        {
-            Texture texture = LoadTexture(aPath.C_Str(), TextureFormat::RGBA);
-            mesh.material.diffuseMap = texture;
-            loadedTextures.push_back(texture);
-        }
-
-        aiColor3D diffuseColor(0.f, 0.f, 0.f);
-        if (aMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == AI_SUCCESS)
-            mesh.material.diffuse = glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b);
-
         UploadMeshData(mesh);
 
         return mesh;
@@ -167,6 +137,8 @@ namespace Graphics
         mesh.indices.clear();
 
         DeleteMeshData(mesh);
-        UnloadTexture(mesh.material.diffuseMap);
+
+        if (mesh.material != NULL)
+            UnloadMaterial(*mesh.material);
     }
 }

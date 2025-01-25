@@ -6,20 +6,34 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glad/glad.h>
 
-static Mesh roomMesh;
+static Material cubeMaterial;
+static Material miiMaterial;
+static Material collectableMaterial;
+
+static Mesh cubeMesh;
 static Mesh miiMesh;
-static Mesh xbotMesh;
+static Mesh collectableMesh;
 
 static Shader postProcessingShader;
 static Shader instancingShader;
 
 ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
 {
-    roomMesh = LoadMesh("assets/models/collectable.glb");
-    miiMesh = LoadMesh("assets/models/cube.glb");
-    xbotMesh = LoadMesh("assets/models/xbot.fbx");
+    cubeMaterial = LoadMaterial("assets/models/cube.glb");
+    cubeMaterial.diffuse = glm::vec3(0.8f, 0.7f, 0.2f);
+    miiMaterial = LoadMaterial("assets/models/mii.fbx");
+    collectableMaterial = LoadMaterial("assets/models/collectable.glb");
 
-    m_directionalLight.intensity = 5.f;
+    cubeMesh = LoadMesh("assets/models/cube.glb", &cubeMaterial);
+    miiMesh = LoadMesh("assets/models/mii.fbx", &miiMaterial);
+    collectableMesh = LoadMesh("assets/models/collectable.glb", &collectableMaterial);
+
+    m_framebuffer = CreateFramebuffer(2);
+    m_framebuffer.attachments[0] = CreateEmptyTexture(spec.windowWidth, spec.windowHeight, TextureFormat::RGB16F);
+    m_framebuffer.attachments[1] = CreateEmptyTexture(spec.windowWidth, spec.windowHeight, TextureFormat::DepthStencil);
+    ApplyFramebufferAttachments(m_framebuffer);
+
+    m_directionalLight.intensity = 3.f;
     m_directionalLight.direction = glm::vec3(0.2f, -0.86f, -0.95f);
 
     postProcessingShader = LoadShader("assets/shaders/PostProcessing_vs.glsl", "assets/shaders/PostProcessing_fs.glsl");
@@ -31,6 +45,7 @@ ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
     instancingShader = LoadShader("assets/shaders/Instancing_vs.glsl", "assets/shaders/Default_fs.glsl");
     instancingShader.CreateMaterialUniform("material");
     instancingShader.CreateDirectionalLightUniform("directionalLight");
+    instancingShader.CreateUniform("cameraPosition");
     instancingShader.CreateUniform("normalMatrix");
     instancingShader.CreateUniform("viewMatrix");
     instancingShader.CreateUniform("projectionMatrix");
@@ -47,9 +62,9 @@ ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
         position.z = rand() % 100 - 50;
 
         std::shared_ptr<Entity>& entity = m_boxes[i];
-        entity = m_entityManager.AddEntity("Room");
+        entity = m_entityManager.AddEntity("Cube");
         entity->AddComponent<TransformComponent>(position, glm::vec3(0.f), glm::vec3(1.f));
-        entity->AddComponent<MeshComponent>(&roomMesh);
+        entity->AddComponent<MeshComponent>(&cubeMesh);
     }
 
     for (u32 i = 0; i < LEN(m_miis); i++)
@@ -65,17 +80,32 @@ ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
         entity->AddComponent<MeshComponent>(&miiMesh);
     }
 
+    for (u32 i = 0; i < LEN(m_miis); i++)
+    {
+        glm::vec3 position;
+        position.x = rand() % 100 - 50;
+        position.y = rand() % 50 - 25;
+        position.z = rand() % 100 - 50;
+
+        std::shared_ptr<Entity>& entity = m_collectables[i];
+        entity = m_entityManager.AddEntity("Collectable");
+        entity->AddComponent<TransformComponent>(position, glm::vec3(0.f), glm::vec3(1.f));
+        entity->AddComponent<MeshComponent>(&collectableMesh);
+    }
+
     SceneViewportPanel::SetPostFXShader(&postProcessingShader);
 }
 
 void ZenEditor::OnShutdown()
 {
+    DestroyFramebuffer(m_framebuffer);
+
     UnloadShader(instancingShader);
     UnloadShader(postProcessingShader);
 
-    UnloadMesh(roomMesh);
+    UnloadMesh(cubeMesh);
     UnloadMesh(miiMesh);
-    UnloadMesh(xbotMesh);
+    UnloadMesh(collectableMesh);
 }
 
 void ZenEditor::OnUpdate()
@@ -91,20 +121,28 @@ void ZenEditor::OnUpdate()
 
 void ZenEditor::OnRender()
 {
-    BindShader(instancingShader);
+    BindFramebuffer(m_framebuffer);
+    Renderer->Clear();
 
-    Renderer->Prepare(m_directionalLight, instancingShader);
+    if (Renderer->GetPrimaryCamera() != NULL)
+    {
+        BindShader(instancingShader);
 
-    for (auto& entity : m_entityManager.GetEntities())
-        Renderer->ProcessEntity(entity);
+        Renderer->Prepare(m_directionalLight, instancingShader);
 
-    Renderer->DrawEntities(instancingShader);
+        for (auto& entity : m_entityManager.GetEntities())
+            Renderer->ProcessEntity(entity);
 
-    UnbindShader();
+        Renderer->DrawEntities(instancingShader);
+
+        UnbindShader();
+    }
+
+    UnbindFramebuffer();
 }
 
 void ZenEditor::OnRenderUI()
 {
     ImGui::DockSpaceOverViewport();
-    m_sceneViewportPanel.Display();
+    m_sceneViewportPanel.Display(m_framebuffer);
 }

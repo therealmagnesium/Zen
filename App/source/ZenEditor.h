@@ -22,7 +22,9 @@ private:
     DirectionalLight m_directionalLight;
     EntityManager m_entityManager;
     SceneViewportPanel m_sceneViewportPanel;
+    Framebuffer m_framebuffer;
 
     std::shared_ptr<Entity> m_boxes[1000];
     std::shared_ptr<Entity> m_miis[1000];
+    std::shared_ptr<Entity> m_collectables[1000];
 };

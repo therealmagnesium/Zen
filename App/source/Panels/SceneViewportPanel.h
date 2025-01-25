@@ -2,6 +2,9 @@
 #include <Zen.h>
 #include <imgui.h>
 
+using namespace Core;
+using namespace Graphics;
+
 class SceneViewportPanel
 {
 public:
@@ -9,12 +12,13 @@ public:
 
     static inline void SetPostFXShader(Graphics::Shader* shader) { s_postProcessingShader = shader; }
 
-    void Display();
+    void Display(Framebuffer& framebuffer);
 
 private:
     static void DrawCallback(const ImDrawList*, const ImDrawCmd*);
 
 private:
     static float s_gammaCorrection;
-    static Graphics::Shader* s_postProcessingShader;
+    static Shader* s_postProcessingShader;
+    static Framebuffer* s_framebuffer;
 };

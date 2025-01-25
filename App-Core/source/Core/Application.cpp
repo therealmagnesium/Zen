@@ -33,8 +33,6 @@ namespace Core
         windowSpec.title = spec.name;
         m_window = Graphics::CreateWindow(windowSpec);
 
-        m_framebuffer = Graphics::CreateFramebuffer(windowSpec.width, windowSpec.height);
-
         m_renderer.Initialize();
         m_renderer.SetClearColor(0.11f, 0.115f, 0.12f);
 
@@ -45,7 +43,6 @@ namespace Core
 
     Application::~Application()
     {
-        Graphics::DestoryFramebuffer(m_framebuffer);
         Graphics::DestroyWindow(m_window);
         UI::DestroyContext();
         m_renderer.Shutdown();
@@ -55,19 +52,12 @@ namespace Core
     {
         while (m_isRunning)
         {
-            Graphics::Camera* primaryCamera = m_renderer.GetPrimaryCamera();
-
             Graphics::HandleWindowEvents(m_window);
             this->OnUpdate();
 
             m_renderer.BeginDrawing();
-            Graphics::BindFramebuffer(m_framebuffer);
 
-            m_renderer.Clear();
-            if (primaryCamera != NULL)
-                this->OnRender();
-
-            Graphics::UnbindFramebuffer();
+            this->OnRender();
 
             UI::BeginFrame();
             this->OnRenderUI();

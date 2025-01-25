@@ -14,16 +14,18 @@ namespace Graphics
         VertexIdentifier vertexBuffer;
         VertexIdentifier instanceBuffer;
         VertexIdentifier indexBuffer;
-        Material material;
+        Material* material = NULL;
         u32 vertexCount = 0;
         u32 indexCount = 0;
         bool shouldCullBackface = true;
         glm::mat4 normalMatrix = glm::mat4(1.f);
         std::vector<Vertex> vertices;
         std::vector<u32> indices;
+
+        static u32 LoadFlags;
     };
 
     Mesh CreateMesh(Vertex* vertices, u32 vertexCount, u32* indices, u32 indexCount);
-    Mesh LoadMesh(const char* path);
+    Mesh LoadMesh(const char* path, Material* material);
     void UnloadMesh(Mesh& mesh);
 }

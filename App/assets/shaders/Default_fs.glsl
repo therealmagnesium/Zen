@@ -21,6 +21,7 @@ struct DirectionalLight
 const float near = 0.1f;
 const float far = 100.f;
 
+uniform vec3 cameraPosition;
 uniform Material material;
 uniform DirectionalLight directionalLight;
 
@@ -43,12 +44,23 @@ float CalculateDiffuse(vec3 normal, vec3 lightDirection)
     return diffuse; 
 }
 
+float CalculateSpecular(vec3 normal, vec3 lightDirection)
+{
+    vec3 viewDirection = normalize(cameraPosition - fragPosition);
+    vec3 reflectDirection = reflect(-lightDirection, normal);
+    float specular = pow(max(dot(viewDirection, reflectDirection), 0.f), 8.f);
+
+    return specular;
+}
+
 vec3 CalculateDirectionalLighting(vec3 normal)
 { 
+    vec3 lightDirection = normalize(-directionalLight.direction);
     vec3 lightOutput = directionalLight.color * directionalLight.intensity;
-    float diffuse = CalculateDiffuse(normal, normalize(-directionalLight.direction));
+    float diffuse = CalculateDiffuse(normal, lightDirection);
+    float specular = CalculateSpecular(normal, lightDirection);
 
-    return lightOutput * diffuse;
+    return lightOutput * (diffuse + specular);
 }
 
 vec3 LinearizeDepth(float depth)

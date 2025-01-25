@@ -122,6 +122,7 @@ namespace Graphics
     {
         if (m_primaryCamera != NULL)
         {
+            shader.SetVec3("cameraPosition", m_primaryCamera->position);
             shader.SetMat4("viewMatrix", m_primaryCamera->view);
             shader.SetMat4("projectionMatrix", m_projection);
             shader.SetLight("directionalLight", directionalLight);
@@ -157,12 +158,11 @@ namespace Graphics
 
     void RenderManager::PrepareMesh(Mesh* mesh, Shader& shader)
     {
-        if (mesh != NULL)
+        if (mesh != NULL && mesh->material != NULL)
         {
             std::vector<glm::mat4>& batch = m_meshTransformsMap[mesh];
 
             BindVertexBuffer(mesh->instanceBuffer);
-
             RenderCommand::SendDataToBuffer(mesh->instanceBuffer, BufferType::Array, batch.data(),
                                             batch.size() * sizeof(glm::mat4));
 
@@ -184,10 +184,10 @@ namespace Graphics
 
             BindVertexArray(mesh->vertexArray);
             BindIndexBuffer(mesh->indexBuffer);
-            BindTexture(mesh->material.diffuseMap, 0);
+            BindTexture(mesh->material->diffuseMap, 0);
 
             shader.SetMat4("normalMatrix", mesh->normalMatrix);
-            shader.SetMaterial("material", mesh->material);
+            shader.SetMaterial("material", *mesh->material);
 
             glEnableVertexAttribArray(0);
             glEnableVertexAttribArray(1);

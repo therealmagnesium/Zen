@@ -13,6 +13,7 @@ namespace Graphics
         RGB16F,
         RGBA,
         R,
+        Depth,
         DepthStencil
     };
 
