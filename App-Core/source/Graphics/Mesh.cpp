@@ -71,10 +71,10 @@ namespace Graphics
         return mesh;
     }
 
-    Mesh LoadMesh(const char* path, Material* material)
+    Mesh LoadMesh(const char* path)
     {
         Mesh mesh;
-        mesh.material = material;
+        mesh.material = LoadMaterial(path);
 
         Assimp::Importer importer;
         const aiScene* model = importer.ReadFile(path, Mesh::LoadFlags);
@@ -137,8 +137,6 @@ namespace Graphics
         mesh.indices.clear();
 
         DeleteMeshData(mesh);
-
-        if (mesh.material != NULL)
-            UnloadMaterial(*mesh.material);
+        UnloadMaterial(mesh.material);
     }
 }

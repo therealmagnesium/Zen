@@ -4,11 +4,6 @@
 #include <imgui.h>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
-#include <glad/glad.h>
-
-static Material cubeMaterial;
-static Material miiMaterial;
-static Material collectableMaterial;
 
 static Mesh cubeMesh;
 static Mesh miiMesh;
@@ -19,14 +14,10 @@ static Shader instancingShader;
 
 ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
 {
-    cubeMaterial = LoadMaterial("assets/models/cube.glb");
-    cubeMaterial.diffuse = glm::vec3(0.8f, 0.7f, 0.2f);
-    miiMaterial = LoadMaterial("assets/models/mii.fbx");
-    collectableMaterial = LoadMaterial("assets/models/collectable.glb");
-
-    cubeMesh = LoadMesh("assets/models/cube.glb", &cubeMaterial);
-    miiMesh = LoadMesh("assets/models/mii.fbx", &miiMaterial);
-    collectableMesh = LoadMesh("assets/models/collectable.glb", &collectableMaterial);
+    cubeMesh = LoadMesh("assets/models/cube.glb");
+    cubeMesh.material.diffuse = glm::vec3(0.8f, 0.7f, 0.2f);
+    miiMesh = LoadMesh("assets/models/mii.fbx");
+    collectableMesh = LoadMesh("assets/models/collectable.glb");
 
     m_framebuffer = CreateFramebuffer(2);
     m_framebuffer.attachments[0] = CreateEmptyTexture(spec.windowWidth, spec.windowHeight, TextureFormat::RGB16F);
@@ -80,7 +71,7 @@ ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
         entity->AddComponent<MeshComponent>(&miiMesh);
     }
 
-    for (u32 i = 0; i < LEN(m_miis); i++)
+    for (u32 i = 0; i < LEN(m_collectables); i++)
     {
         glm::vec3 position;
         position.x = rand() % 100 - 50;
@@ -122,7 +113,7 @@ void ZenEditor::OnUpdate()
 void ZenEditor::OnRender()
 {
     BindFramebuffer(m_framebuffer);
-    Renderer->Clear();
+    Renderer->Clear(true, true, false);
 
     if (Renderer->GetPrimaryCamera() != NULL)
     {

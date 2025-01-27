@@ -62,7 +62,6 @@ namespace Graphics
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
 
-        this->Clear();
         this->CalculateProjection();
     }
 
@@ -72,10 +71,19 @@ namespace Graphics
         DisplayWindow(window);
     }
 
-    void RenderManager::Clear()
+    void RenderManager::Clear(bool color, bool depth, bool stencil)
     {
         glClearColor(pow(m_clearColor.x, 2.2f), pow(m_clearColor.y, 2.2f), pow(m_clearColor.z, 2.2f), 1.f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        u32 bufferBit = 0;
+        if (color)
+            bufferBit |= (u32)BufferBit::Color;
+        if (depth)
+            bufferBit |= (u32)BufferBit::Depth;
+        if (stencil)
+            bufferBit |= (u32)BufferBit::Stencil;
+
+        glClear(bufferBit);
     }
 
     void RenderManager::CullFace(FaceCull cull)
@@ -158,7 +166,7 @@ namespace Graphics
 
     void RenderManager::PrepareMesh(Mesh* mesh, Shader& shader)
     {
-        if (mesh != NULL && mesh->material != NULL)
+        if (mesh != NULL)
         {
             std::vector<glm::mat4>& batch = m_meshTransformsMap[mesh];
 
@@ -184,10 +192,10 @@ namespace Graphics
 
             BindVertexArray(mesh->vertexArray);
             BindIndexBuffer(mesh->indexBuffer);
-            BindTexture(mesh->material->diffuseMap, 0);
+            BindTexture(mesh->material.diffuseMap, 0);
 
             shader.SetMat4("normalMatrix", mesh->normalMatrix);
-            shader.SetMaterial("material", *mesh->material);
+            shader.SetMaterial("material", mesh->material);
 
             glEnableVertexAttribArray(0);
             glEnableVertexAttribArray(1);

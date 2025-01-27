@@ -19,9 +19,15 @@ namespace Graphics
     {
         BindFramebuffer(framebuffer);
 
+        u32 glAttachments[framebuffer.attachments.size()];
         for (u32 i = 0; i < framebuffer.attachments.size(); i++)
+        {
             RenderCommand::AttachToFramebuffer(framebuffer, framebuffer.attachments[i],
                                                framebuffer.attachments[i].format);
+            glAttachments[i] = GL_COLOR_ATTACHMENT0 + i;
+        }
+
+        glDrawBuffers(framebuffer.attachments.size(), glAttachments);
 
         UnbindFramebuffer();
     }

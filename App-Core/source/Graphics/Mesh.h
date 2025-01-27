@@ -14,7 +14,7 @@ namespace Graphics
         VertexIdentifier vertexBuffer;
         VertexIdentifier instanceBuffer;
         VertexIdentifier indexBuffer;
-        Material* material = NULL;
+        Material material;
         u32 vertexCount = 0;
         u32 indexCount = 0;
         bool shouldCullBackface = true;
@@ -26,6 +26,6 @@ namespace Graphics
     };
 
     Mesh CreateMesh(Vertex* vertices, u32 vertexCount, u32* indices, u32 indexCount);
-    Mesh LoadMesh(const char* path, Material* material);
+    Mesh LoadMesh(const char* path);
     void UnloadMesh(Mesh& mesh);
 }

@@ -6,6 +6,7 @@
 #include "Core/Entity.h"
 
 #include <glm/glm.hpp>
+#include <glad/glad.h>
 #include <memory>
 
 namespace Graphics
@@ -14,6 +15,13 @@ namespace Graphics
     {
         Back = 0,
         Front,
+    };
+
+    enum class BufferBit
+    {
+        Color = GL_COLOR_BUFFER_BIT,
+        Depth = GL_DEPTH_BUFFER_BIT,
+        Stencil = GL_STENCIL_BUFFER_BIT
     };
 
     class RenderManager
@@ -37,7 +45,7 @@ namespace Graphics
         void BeginDrawing();
         void EndDrawing();
 
-        void Clear();
+        void Clear(bool color, bool depth, bool stencil);
         void CullFace(FaceCull cull);
 
         void ProcessEntity(std::shared_ptr<Core::Entity>& entity);

@@ -2,7 +2,6 @@
 
 #include <Zen.h>
 #include <imgui.h>
-#include <glad/glad.h>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 

@@ -6,6 +6,7 @@
 #include "Core/Time.h"
 
 #include "Graphics/Renderer.h"
+#include "Graphics/RenderCommand.h"
 
 #include "UI/UI.h"
 
@@ -43,7 +44,7 @@ namespace Graphics
 
         window.specification = spec;
         window.handle = SDL_CreateWindow(spec.title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, spec.width,
-                                         spec.height, SDL_WINDOW_OPENGL);
+                                         spec.height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
         if (window.handle == NULL)
         {
@@ -60,6 +61,7 @@ namespace Graphics
 
     void HandleWindowEvents(Window& window)
     {
+        Core::ApplicationSpecification& appInfo = Core::App->GetSpecification();
         Core::UpdateTime();
         Renderer->CalculateProjection();
 
@@ -106,6 +108,26 @@ namespace Graphics
                     Core::Input.mouse.buttonsClicked[event.button.button] = false;
                     Core::Input.mouse.buttonsHeld[event.button.button] = false;
                     break;
+
+                case SDL_WINDOWEVENT:
+                {
+                    switch (event.window.event)
+                    {
+                        case SDL_WINDOWEVENT_RESIZED:
+                        {
+                            appInfo.windowWidth = event.window.data1;
+                            appInfo.windowHeight = event.window.data2;
+                            RenderCommand::SetViewport(appInfo.windowWidth, appInfo.windowHeight);
+                            Renderer->CalculateProjection();
+
+                            INFO("Resized window to %dx%d", appInfo.windowWidth, appInfo.windowHeight);
+
+                            break;
+                        }
+                    }
+
+                    break;
+                }
             }
         }
     }

@@ -48,7 +48,7 @@ float CalculateSpecular(vec3 normal, vec3 lightDirection)
 {
     vec3 viewDirection = normalize(cameraPosition - fragPosition);
     vec3 reflectDirection = reflect(-lightDirection, normal);
-    float specular = pow(max(dot(viewDirection, reflectDirection), 0.f), 8.f);
+    float specular = pow(max(dot(viewDirection, reflectDirection), 0.f), 128.f);
 
     return specular;
 }

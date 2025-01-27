@@ -23,7 +23,7 @@ namespace Graphics
             return val;
         }
 
-        static u32 TextureFormatToGLFramebufferAttachment(TextureFormat format)
+        static u32 TextureFormatToGLFramebufferAttachment(TextureFormat format, u8 slot)
         {
             u32 val = 0;
             switch (format)
@@ -32,7 +32,7 @@ namespace Graphics
                 case TextureFormat::RGBA:
                 case TextureFormat::RGB16F:
                 case TextureFormat::R:
-                    val = GL_COLOR_ATTACHMENT0;
+                    val = GL_COLOR_ATTACHMENT0 + slot;
                     break;
 
                 case TextureFormat::Depth:
@@ -47,6 +47,11 @@ namespace Graphics
                     break;
             }
             return val;
+        }
+
+        void SetViewport(u32 width, u32 height)
+        {
+            glViewport(0, 0, width, height);
         }
 
         void SendDataToBuffer(VertexIdentifier& buffer, BufferType type, void* data, u64 size)
@@ -66,9 +71,13 @@ namespace Graphics
 
         void AttachToFramebuffer(Framebuffer& framebuffer, Texture& attachment, TextureFormat format)
         {
-            u32 glType = TextureFormatToGLFramebufferAttachment(format);
+            static u8 slot = 0;
+            u32 glType = TextureFormatToGLFramebufferAttachment(format, slot);
             if (framebuffer.isSelected)
                 glFramebufferTexture2D(GL_FRAMEBUFFER, glType, GL_TEXTURE_2D, attachment.id, 0);
+
+            if (format == TextureFormat::RGB16F || format == TextureFormat::RGB || format == TextureFormat::RGBA)
+                slot++;
         }
     }
 }

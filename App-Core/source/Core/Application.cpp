@@ -56,6 +56,7 @@ namespace Core
             this->OnUpdate();
 
             m_renderer.BeginDrawing();
+            m_renderer.Clear(true, false, false);
 
             this->OnRender();
 
