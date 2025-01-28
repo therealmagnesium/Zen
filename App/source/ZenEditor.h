@@ -29,7 +29,7 @@ private:
     SceneViewportPanel m_sceneViewportPanel;
     Framebuffer m_framebuffer;
 
-    std::shared_ptr<Entity> m_boxes[100];
-    std::shared_ptr<Entity> m_miis[100];
-    std::shared_ptr<Entity> m_collectables[100];
+    std::shared_ptr<Entity> m_boxes[500];
+    std::shared_ptr<Entity> m_miis[500];
+    std::shared_ptr<Entity> m_collectables[500];
 };

@@ -1,4 +1,5 @@
 #pragma once
+#include "Graphics/Texture.h"
 #include "Core/Base.h"
 
 #include <stdlib.h>
@@ -15,7 +16,7 @@ namespace Graphics
         u8* data[6]{NULL};
     };
 
-    Skybox LoadSkybox(const char** paths);
+    Skybox LoadSkybox(const char** paths, TextureFormat textureFormat);
     void BindSkybox(Skybox& skybox);
     void UnbindSkybox();
     void UnloadSkybox(Skybox& skybox);

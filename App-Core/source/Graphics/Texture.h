@@ -29,6 +29,10 @@ namespace Graphics
         TextureFormat format;
     };
 
+    u32 GetInternalTextureFormat(TextureFormat format, bool isEmptyTexture);
+    u32 GetGLTextureFormat(TextureFormat format);
+    u32 GetTextureDataType(TextureFormat format);
+
     Texture CreateEmptyTexture(u32 width, u32 height, TextureFormat format);
     Texture LoadTexture(const char* path, TextureFormat format);
     void BindTexture(Texture& texture, u8 slot);

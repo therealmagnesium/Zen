@@ -167,5 +167,5 @@ void ZenEditor::SetupSkybox()
     skyboxTexturePaths[4] = "assets/textures/skybox5/posz.png";
     skyboxTexturePaths[5] = "assets/textures/skybox5/negz.png";
 
-    m_skybox = LoadSkybox(skyboxTexturePaths);
+    m_skybox = LoadSkybox(skyboxTexturePaths, TextureFormat::RGBA);
 }
