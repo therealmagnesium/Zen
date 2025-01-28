@@ -17,6 +17,7 @@
 #include "Graphics/Mesh.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/Shader.h"
+#include "Graphics/Skybox.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Window.h"
 

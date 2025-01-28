@@ -2,6 +2,7 @@
 #include "Graphics/Camera.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/Shader.h"
+#include "Graphics/Skybox.h"
 
 #include "Core/Entity.h"
 
@@ -47,11 +48,13 @@ namespace Graphics
 
         void Clear(bool color, bool depth, bool stencil);
         void CullFace(FaceCull cull);
+        void WriteDepth(bool shouldWriteDepth);
 
         void ProcessEntity(std::shared_ptr<Core::Entity>& entity);
 
         void Prepare(DirectionalLight& directionalLight, Shader& shader);
         void DrawEntities(Shader& shader);
+        void DrawSkybox(Skybox& skybox, Mesh& cube, Shader& shader);
 
     private:
         void PrepareMesh(Mesh* mesh, Shader& shader);

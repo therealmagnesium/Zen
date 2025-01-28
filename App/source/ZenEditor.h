@@ -18,13 +18,18 @@ public:
     void OnShutdown() override;
 
 private:
+    void SetupShaders();
+    void SetupSkybox();
+
+private:
     Camera m_camera;
     DirectionalLight m_directionalLight;
+    Skybox m_skybox;
     EntityManager m_entityManager;
     SceneViewportPanel m_sceneViewportPanel;
     Framebuffer m_framebuffer;
 
-    std::shared_ptr<Entity> m_boxes[1000];
-    std::shared_ptr<Entity> m_miis[1000];
-    std::shared_ptr<Entity> m_collectables[1000];
+    std::shared_ptr<Entity> m_boxes[100];
+    std::shared_ptr<Entity> m_miis[100];
+    std::shared_ptr<Entity> m_collectables[100];
 };

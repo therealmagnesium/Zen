@@ -92,6 +92,11 @@ namespace Graphics
         glCullFace(glCull);
     }
 
+    void RenderManager::WriteDepth(bool shouldWriteDepth)
+    {
+        glDepthMask(shouldWriteDepth);
+    }
+
     void RenderManager::ProcessEntity(std::shared_ptr<Core::Entity>& entity)
     {
         if (entity->HasComponent<Core::MeshComponent>())
@@ -141,14 +146,14 @@ namespace Graphics
     {
         if (m_primaryCamera != NULL)
         {
-            Renderer->CullFace(FaceCull::Back);
+            CullFace(FaceCull::Back);
 
             for (auto& [mesh, entities] : m_meshEntitiesMap)
             {
                 if (mesh != NULL)
                 {
                     if (!mesh->shouldCullBackface)
-                        Renderer->CullFace(FaceCull::Front);
+                        CullFace(FaceCull::Front);
 
                     PrepareMesh(mesh, shader);
 
@@ -162,6 +167,40 @@ namespace Graphics
 
         m_meshEntitiesMap.clear();
         m_meshTransformsMap.clear();
+    }
+
+    void RenderManager::DrawSkybox(Skybox& skybox, Mesh& cube, Shader& shader)
+    {
+        assert(m_primaryCamera != NULL);
+        glm::mat4 skyboxView = glm::mat4(glm::mat3(m_primaryCamera->view));
+
+        WriteDepth(false);
+        BindShader(shader);
+
+        shader.SetInt("skybox", 0);
+        shader.SetMat4("viewMatrix", skyboxView);
+        shader.SetMat4("projectionMatrix", m_projection);
+
+        BindVertexArray(cube.vertexArray);
+        BindIndexBuffer(cube.indexBuffer);
+        BindSkybox(skybox);
+
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
+        glEnableVertexAttribArray(2);
+
+        glDrawElements(GL_TRIANGLES, cube.indexCount, GL_UNSIGNED_INT, NULL);
+
+        glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(2);
+
+        UnbindSkybox();
+        UnbindIndexBuffer();
+        UnbindVertexArray();
+
+        UnbindShader();
+        WriteDepth(true);
     }
 
     void RenderManager::PrepareMesh(Mesh* mesh, Shader& shader)

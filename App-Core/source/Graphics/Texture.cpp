@@ -175,6 +175,8 @@ namespace Graphics
             stbi_image_free(texture.data);
             texture.isValid = false;
         }
+
+        glDeleteTextures(1, &texture.id);
     }
 
     void BindTexture(Texture& texture, u8 slot)

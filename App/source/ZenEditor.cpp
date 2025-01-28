@@ -10,7 +10,10 @@ static Mesh miiMesh;
 static Mesh collectableMesh;
 
 static Shader postProcessingShader;
+static Shader skyboxShder;
 static Shader instancingShader;
+
+static const char* skyboxTexturePaths[6];
 
 ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
 {
@@ -27,19 +30,8 @@ ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
     m_directionalLight.intensity = 3.f;
     m_directionalLight.direction = glm::vec3(0.2f, -0.86f, -0.95f);
 
-    postProcessingShader = LoadShader("assets/shaders/PostProcessing_vs.glsl", "assets/shaders/PostProcessing_fs.glsl");
-    postProcessingShader.CreateUniform("screenTexture");
-    postProcessingShader.CreateUniform("projectionMatrix");
-    postProcessingShader.CreateUniform("gamma");
-    postProcessingShader.CreateUniform("exposure");
-
-    instancingShader = LoadShader("assets/shaders/Instancing_vs.glsl", "assets/shaders/Default_fs.glsl");
-    instancingShader.CreateMaterialUniform("material");
-    instancingShader.CreateDirectionalLightUniform("directionalLight");
-    instancingShader.CreateUniform("cameraPosition");
-    instancingShader.CreateUniform("normalMatrix");
-    instancingShader.CreateUniform("viewMatrix");
-    instancingShader.CreateUniform("projectionMatrix");
+    this->SetupShaders();
+    this->SetupSkybox();
 
     m_camera.position = glm::vec3(-8.5f, 4.2f, 10.f);
     m_camera.rotation = glm::vec3(-53.3f, -33.4f, 0.f);
@@ -91,7 +83,10 @@ void ZenEditor::OnShutdown()
 {
     DestroyFramebuffer(m_framebuffer);
 
+    UnloadSkybox(m_skybox);
+
     UnloadShader(instancingShader);
+    UnloadShader(skyboxShder);
     UnloadShader(postProcessingShader);
 
     UnloadMesh(cubeMesh);
@@ -117,6 +112,9 @@ void ZenEditor::OnRender()
 
     if (Renderer->GetPrimaryCamera() != NULL)
     {
+        Renderer->CullFace(FaceCull::Front);
+        Renderer->DrawSkybox(m_skybox, cubeMesh, skyboxShder);
+
         BindShader(instancingShader);
 
         Renderer->Prepare(m_directionalLight, instancingShader);
@@ -136,4 +134,38 @@ void ZenEditor::OnRenderUI()
 {
     ImGui::DockSpaceOverViewport();
     m_sceneViewportPanel.Display(m_framebuffer);
+}
+
+void ZenEditor::SetupShaders()
+{
+    postProcessingShader = LoadShader("assets/shaders/PostProcessing_vs.glsl", "assets/shaders/PostProcessing_fs.glsl");
+    postProcessingShader.CreateUniform("screenTexture");
+    postProcessingShader.CreateUniform("projectionMatrix");
+    postProcessingShader.CreateUniform("gamma");
+    postProcessingShader.CreateUniform("exposure");
+
+    skyboxShder = LoadShader("assets/shaders/Skybox_vs.glsl", "assets/shaders/Skybox_fs.glsl");
+    skyboxShder.CreateUniform("viewMatrix");
+    skyboxShder.CreateUniform("projectionMatrix");
+    skyboxShder.CreateUniform("skybox");
+
+    instancingShader = LoadShader("assets/shaders/Instancing_vs.glsl", "assets/shaders/Default_fs.glsl");
+    instancingShader.CreateMaterialUniform("material");
+    instancingShader.CreateDirectionalLightUniform("directionalLight");
+    instancingShader.CreateUniform("cameraPosition");
+    instancingShader.CreateUniform("normalMatrix");
+    instancingShader.CreateUniform("viewMatrix");
+    instancingShader.CreateUniform("projectionMatrix");
+}
+
+void ZenEditor::SetupSkybox()
+{
+    skyboxTexturePaths[0] = "assets/textures/skybox5/posx.png";
+    skyboxTexturePaths[1] = "assets/textures/skybox5/negx.png";
+    skyboxTexturePaths[2] = "assets/textures/skybox5/posy.png";
+    skyboxTexturePaths[3] = "assets/textures/skybox5/negy.png";
+    skyboxTexturePaths[4] = "assets/textures/skybox5/posz.png";
+    skyboxTexturePaths[5] = "assets/textures/skybox5/negz.png";
+
+    m_skybox = LoadSkybox(skyboxTexturePaths);
 }
