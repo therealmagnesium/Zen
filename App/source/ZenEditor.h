@@ -1,4 +1,5 @@
 #pragma once
+#include "Panels/SceneHeirarchyPanel.h"
 #include "Panels/SceneViewportPanel.h"
 
 #include <Zen.h>
@@ -23,14 +24,13 @@ private:
     void SetupGameObjects();
 
 private:
-    Camera m_camera;
     DirectionalLight m_directionalLight;
     Skybox m_skybox;
-    EntityManager m_entityManager;
-    SceneViewportPanel m_sceneViewportPanel;
     Framebuffer m_framebuffer;
+    Scene m_activeScene;
 
-    std::shared_ptr<Entity> m_boxes[500];
-    std::shared_ptr<Entity> m_miis[500];
-    std::shared_ptr<Entity> m_collectables[500];
+    SceneHeirarchyPanel m_sceneHeirarchyPanel;
+    SceneViewportPanel m_sceneViewportPanel;
+
+    std::shared_ptr<Entity> m_entity;
 };

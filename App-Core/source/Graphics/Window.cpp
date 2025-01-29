@@ -63,7 +63,6 @@ namespace Graphics
     {
         Core::ApplicationSpecification& appInfo = Core::App->GetSpecification();
         Core::UpdateTime();
-        Renderer->CalculateProjection();
 
         for (int i = 0; i < MOUSE_BUTTON_COUNT; i++)
             Core::Input.mouse.buttonsClicked[i] = false;

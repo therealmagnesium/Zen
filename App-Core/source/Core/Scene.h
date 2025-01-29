@@ -9,8 +9,14 @@ namespace Core
     public:
         Scene() = default;
 
+        inline EntityManager& GetEntityManager() { return m_entityManager; }
+        inline Graphics::Camera& GetEditorCamera() { return m_editorCamera; }
+        inline std::vector<std::shared_ptr<Entity>>& GetEntities() { return m_entityManager.GetEntities(); }
+
         void Initialize();
-        void AddEntity(const char* tag);
+        void Update();
+
+        std::shared_ptr<Entity> AddEntity(const char* tag);
         void DestroyEntity(std::shared_ptr<Entity>& entity);
 
     private:

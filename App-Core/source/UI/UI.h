@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Base.h"
 #include <SDL2/SDL_events.h>
+#include <imgui.h>
 
 namespace UI
 {

@@ -1,8 +1,6 @@
 #include "Core/Application.h"
 #include "Core/Log.h"
 
-#include "Graphics/Camera.h"
-
 #include "UI/UI.h"
 
 #include <glad/glad.h>
@@ -59,12 +57,7 @@ namespace Core
             m_renderer.Clear(true, false, false);
 
             this->OnRender();
-
-            UI::BeginFrame();
             this->OnRenderUI();
-            UI::EndFrame();
-
-            UI::RenderFrame();
 
             m_renderer.EndDrawing();
         }

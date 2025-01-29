@@ -1,6 +1,7 @@
 #include "SceneViewportPanel.h"
 
 #include <Zen.h>
+
 #include <imgui.h>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
@@ -8,6 +9,7 @@
 using namespace Core;
 using namespace Graphics;
 
+ImDrawList* SceneViewportPanel::s_drawList = NULL;
 Shader* SceneViewportPanel::s_postProcessingShader = NULL;
 Framebuffer* SceneViewportPanel::s_framebuffer = NULL;
 float SceneViewportPanel::s_gammaCorrection = 2.2f;
@@ -20,9 +22,14 @@ void SceneViewportPanel::Display(Framebuffer& framebuffer)
 
     ImGui::Begin("Scene Viewport");
     {
-        ImDrawList* drawList = ImGui::GetWindowDrawList();
-        drawList->AddCallback(DrawCallback, nullptr);
-        ImGui::Image((void*)displayTexture, ImGui::GetContentRegionAvail(), ImVec2(0, 1), ImVec2(1, 0));
+        s_drawList = ImGui::GetWindowDrawList();
+        s_drawList->AddCallback(DrawCallback, nullptr);
+
+        ImVec2 aspectSize = this->GetLargestViewportSize();
+        ImVec2 windowPosition = this->GetCenteredViewportPosition(aspectSize);
+
+        ImGui::SetCursorPos(windowPosition);
+        ImGui::Image((void*)displayTexture, aspectSize, ImVec2(0, 1), ImVec2(1, 0));
     }
     ImGui::End();
 }
@@ -37,7 +44,7 @@ void SceneViewportPanel::DrawCallback(const ImDrawList*, const ImDrawCmd*)
 
     glm::mat4 projection = glm::ortho(L, R, B, T);
 
-    if (s_postProcessingShader != NULL)
+    if (s_postProcessingShader != NULL && s_framebuffer != NULL)
     {
         BindShader(*s_postProcessingShader);
         BindTexture(s_framebuffer->attachments[0], 0);
@@ -47,4 +54,32 @@ void SceneViewportPanel::DrawCallback(const ImDrawList*, const ImDrawCmd*)
         s_postProcessingShader->SetFloat("gamma", s_gammaCorrection);
         s_postProcessingShader->SetFloat("exposure", Renderer->GetExposure());
     }
+}
+
+ImVec2 SceneViewportPanel::GetLargestViewportSize()
+{
+    const ApplicationSpecification& appInfo = App->GetSpecification();
+    ImVec2 windowSize = ImGui::GetContentRegionAvail();
+
+    float aspectRatio = appInfo.windowWidth / (float)appInfo.windowHeight;
+    ImVec2 aspect = ImVec2(windowSize.x, windowSize.x / aspectRatio);
+
+    if (aspect.y > windowSize.y)
+    {
+        aspect.y = windowSize.y;
+        aspect.x = aspect.y * aspectRatio;
+    }
+
+    return aspect;
+}
+
+ImVec2 SceneViewportPanel::GetCenteredViewportPosition(ImVec2 aspectSize)
+{
+    ImVec2 windowSize = ImGui::GetContentRegionAvail();
+
+    ImVec2 viewportPosition;
+    viewportPosition.x = (windowSize.x / 2.f) - (aspectSize.x / 2.f);
+    viewportPosition.y = (windowSize.y / 2.f) - (aspectSize.y / 2.f);
+
+    return viewportPosition;
 }

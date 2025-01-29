@@ -55,6 +55,11 @@ namespace Graphics
 
         camera.rotation.x += offset.x;
         camera.rotation.y += offset.y;
+
+        if (camera.rotation.y > 89.f)
+            camera.rotation.y = 89.f;
+        if (camera.rotation.y < -89.f)
+            camera.rotation.y = -89.f;
     }
 
     void LogCameraInfo(Camera& camera)
