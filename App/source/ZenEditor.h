@@ -20,6 +20,7 @@ public:
 private:
     void SetupShaders();
     void SetupSkybox();
+    void SetupGameObjects();
 
 private:
     Camera m_camera;

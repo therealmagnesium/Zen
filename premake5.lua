@@ -1,4 +1,4 @@
-workspace("Luma3D")
+workspace("Zen")
 architecture("x64")
 
 configurations({

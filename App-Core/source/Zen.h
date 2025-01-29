@@ -8,6 +8,7 @@
 #include "Core/Input.h"
 #include "Core/KeyCodes.h"
 #include "Core/Log.h"
+#include "Core/Scene.h"
 #include "Core/Time.h"
 
 #include "Graphics/Camera.h"

@@ -22,59 +22,21 @@ ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
     miiMesh = LoadMesh("assets/models/mii.fbx");
     collectableMesh = LoadMesh("assets/models/collectable.glb");
 
+    m_camera.position = glm::vec3(-8.5f, 4.2f, 10.f);
+    m_camera.rotation = glm::vec3(-53.3f, -33.4f, 0.f);
+    Renderer->SetPrimaryCamera(&m_camera);
+
+    m_directionalLight.intensity = 3.f;
+    m_directionalLight.direction = glm::vec3(0.2f, -0.86f, -0.95f);
+
     m_framebuffer = CreateFramebuffer(2);
     m_framebuffer.attachments[0] = CreateEmptyTexture(spec.windowWidth, spec.windowHeight, TextureFormat::RGB16F);
     m_framebuffer.attachments[1] = CreateEmptyTexture(spec.windowWidth, spec.windowHeight, TextureFormat::DepthStencil);
     ApplyFramebufferAttachments(m_framebuffer);
 
-    m_directionalLight.intensity = 3.f;
-    m_directionalLight.direction = glm::vec3(0.2f, -0.86f, -0.95f);
-
     this->SetupShaders();
     this->SetupSkybox();
-
-    m_camera.position = glm::vec3(-8.5f, 4.2f, 10.f);
-    m_camera.rotation = glm::vec3(-53.3f, -33.4f, 0.f);
-    Renderer->SetPrimaryCamera(&m_camera);
-
-    for (u32 i = 0; i < LEN(m_boxes); i++)
-    {
-        glm::vec3 position;
-        position.x = rand() % 100 - 50;
-        position.y = rand() % 50 - 25;
-        position.z = rand() % 100 - 50;
-
-        std::shared_ptr<Entity>& entity = m_boxes[i];
-        entity = m_entityManager.AddEntity("Cube");
-        entity->AddComponent<TransformComponent>(position, glm::vec3(0.f), glm::vec3(1.f));
-        entity->AddComponent<MeshComponent>(&cubeMesh);
-    }
-
-    for (u32 i = 0; i < LEN(m_miis); i++)
-    {
-        glm::vec3 position;
-        position.x = rand() % 100 - 50;
-        position.y = rand() % 50 - 25;
-        position.z = rand() % 100 - 50;
-
-        std::shared_ptr<Entity>& entity = m_miis[i];
-        entity = m_entityManager.AddEntity("Mii");
-        entity->AddComponent<TransformComponent>(position, glm::vec3(0.f), glm::vec3(1.f));
-        entity->AddComponent<MeshComponent>(&miiMesh);
-    }
-
-    for (u32 i = 0; i < LEN(m_collectables); i++)
-    {
-        glm::vec3 position;
-        position.x = rand() % 100 - 50;
-        position.y = rand() % 50 - 25;
-        position.z = rand() % 100 - 50;
-
-        std::shared_ptr<Entity>& entity = m_collectables[i];
-        entity = m_entityManager.AddEntity("Collectable");
-        entity->AddComponent<TransformComponent>(position, glm::vec3(0.f), glm::vec3(1.f));
-        entity->AddComponent<MeshComponent>(&collectableMesh);
-    }
+    this->SetupGameObjects();
 
     SceneViewportPanel::SetPostFXShader(&postProcessingShader);
 }
@@ -168,4 +130,46 @@ void ZenEditor::SetupSkybox()
     skyboxTexturePaths[5] = "assets/textures/skybox5/negz.png";
 
     m_skybox = LoadSkybox(skyboxTexturePaths, TextureFormat::RGBA);
+}
+
+void ZenEditor::SetupGameObjects()
+{
+    for (u32 i = 0; i < LEN(m_boxes); i++)
+    {
+        glm::vec3 position;
+        position.x = rand() % 100 - 50;
+        position.y = rand() % 50 - 25;
+        position.z = rand() % 100 - 50;
+
+        std::shared_ptr<Entity>& entity = m_boxes[i];
+        entity = m_entityManager.AddEntity("Cube");
+        entity->AddComponent<TransformComponent>(position, glm::vec3(0.f), glm::vec3(1.f));
+        entity->AddComponent<MeshComponent>(&cubeMesh);
+    }
+
+    for (u32 i = 0; i < LEN(m_miis); i++)
+    {
+        glm::vec3 position;
+        position.x = rand() % 100 - 50;
+        position.y = rand() % 50 - 25;
+        position.z = rand() % 100 - 50;
+
+        std::shared_ptr<Entity>& entity = m_miis[i];
+        entity = m_entityManager.AddEntity("Mii");
+        entity->AddComponent<TransformComponent>(position, glm::vec3(0.f), glm::vec3(1.f));
+        entity->AddComponent<MeshComponent>(&miiMesh);
+    }
+
+    for (u32 i = 0; i < LEN(m_collectables); i++)
+    {
+        glm::vec3 position;
+        position.x = rand() % 100 - 50;
+        position.y = rand() % 50 - 25;
+        position.z = rand() % 100 - 50;
+
+        std::shared_ptr<Entity>& entity = m_collectables[i];
+        entity = m_entityManager.AddEntity("Collectable");
+        entity->AddComponent<TransformComponent>(position, glm::vec3(0.f), glm::vec3(1.f));
+        entity->AddComponent<MeshComponent>(&collectableMesh);
+    }
 }

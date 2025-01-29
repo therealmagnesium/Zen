@@ -17,6 +17,8 @@ namespace Graphics
 
         for (u8 i = 0; i < LEN(skybox.data); i++)
         {
+            skybox.data[i] = NULL;
+
             stbi_set_flip_vertically_on_load(false);
             skybox.data[i] = stbi_load(paths[i], &skybox.textureWidth, &skybox.textureHeight, &skybox.channelCount, 0);
 
@@ -25,8 +27,12 @@ namespace Graphics
             u32 dataType = GetTextureDataType(textureFormat);
 
             if (skybox.data[i] != NULL)
+            {
                 glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, skybox.textureWidth,
                              skybox.textureHeight, 0, glFormat, dataType, skybox.data[i]);
+
+                INFO("Skybox loaded texture %s", paths[i]);
+            }
         }
 
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -37,14 +43,14 @@ namespace Graphics
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
-        INFO("Skybox loaded");
+        INFO("Skybox finished loading textures");
 
         return skybox;
     }
 
     void UnloadSkybox(Skybox& skybox)
     {
-        INFO("Unloading skybox");
+        INFO("Unloading skybox textures...");
 
         for (u32 i = 0; i < LEN(skybox.data); i++)
         {
