@@ -2,6 +2,8 @@
 #include "Graphics/Texture.h"
 #include "Graphics/RenderCommand.h"
 
+#include "Core/Log.h"
+
 #include <glad/glad.h>
 
 namespace Graphics
@@ -30,6 +32,21 @@ namespace Graphics
         glDrawBuffers(framebuffer.attachments.size(), glAttachments);
 
         UnbindFramebuffer();
+    }
+
+    void ResizeFramebuffer(Framebuffer& framebuffer, u32 width, u32 height)
+    {
+        TextureFormat formats[framebuffer.attachments.size()];
+
+        for (u32 i = 0; i < framebuffer.attachments.size(); i++)
+        {
+            formats[i] = framebuffer.attachments[i].format;
+            framebuffer.attachments[i].width = width;
+            framebuffer.attachments[i].height = height;
+            InvalidateTexture(framebuffer.attachments[i], true);
+        }
+
+        ApplyFramebufferAttachments(framebuffer);
     }
 
     void BindFramebuffer(Framebuffer& framebuffer)

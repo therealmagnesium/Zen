@@ -70,6 +70,8 @@ namespace Graphics
         for (int i = 0; i < KEY_COUNT; i++)
             Core::Input.keyboard.keysPressed[i] = false;
 
+        window.isResizing = false;
+
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
@@ -114,8 +116,11 @@ namespace Graphics
                     {
                         case SDL_WINDOWEVENT_RESIZED:
                         {
+                            window.isResizing = true;
+
                             appInfo.windowWidth = event.window.data1;
                             appInfo.windowHeight = event.window.data2;
+
                             RenderCommand::SetViewport(appInfo.windowWidth, appInfo.windowHeight);
                             Renderer->CalculateProjection();
 

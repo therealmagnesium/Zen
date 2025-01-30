@@ -25,6 +25,7 @@ namespace Core
         virtual ~Application();
 
         inline bool IsRunning() const { return m_isRunning; }
+        inline bool IsResizing() const { return m_window.isResizing; }
         inline Graphics::Window& GetWindow() { return m_window; }
         inline ApplicationSpecification& GetSpecification() { return m_specification; }
 

@@ -35,6 +35,7 @@ namespace Graphics
 
     Texture CreateEmptyTexture(u32 width, u32 height, TextureFormat format);
     Texture LoadTexture(const char* path, TextureFormat format);
+    void InvalidateTexture(Texture& texture, bool isEmptyTexture);
     void BindTexture(Texture& texture, u8 slot);
     void UnbindTexture();
     void UnloadTexture(Texture& texture);

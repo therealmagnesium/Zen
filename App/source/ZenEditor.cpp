@@ -2,6 +2,7 @@
 #include "Panels/SceneViewportPanel.h"
 
 #include <imgui.h>
+#include <imgui_impl_opengl3.h>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 
@@ -93,8 +94,8 @@ void ZenEditor::OnRenderUI()
 
     ImGui::DockSpaceOverViewport();
 
-    m_sceneHeirarchyPanel.Display();
     m_sceneViewportPanel.Display(m_framebuffer);
+    m_sceneHeirarchyPanel.Display();
 
     UI::EndFrame();
 

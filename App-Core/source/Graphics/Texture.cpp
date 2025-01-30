@@ -6,14 +6,8 @@
 
 namespace Graphics
 {
-    Texture CreateEmptyTexture(u32 width, u32 height, TextureFormat format)
+    void InvalidateTexture(Texture& texture, bool isEmptyTexture)
     {
-        Texture texture;
-        texture.width = width;
-        texture.height = height;
-        texture.format = format;
-
-        glGenTextures(1, &texture.id);
         glBindTexture(GL_TEXTURE_2D, texture.id);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -22,11 +16,24 @@ namespace Graphics
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         u32 glFormat = GetGLTextureFormat(texture.format);
-        u32 internalFormat = GetInternalTextureFormat(texture.format, true);
+        u32 internalFormat = GetInternalTextureFormat(texture.format, isEmptyTexture);
         u32 dataType = GetTextureDataType(texture.format);
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, texture.width, texture.height, 0, glFormat, dataType, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, texture.width, texture.height, 0, glFormat, dataType,
+                     texture.data);
 
+        // glGenerateMipmap(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    Texture CreateEmptyTexture(u32 width, u32 height, TextureFormat format)
+    {
+        Texture texture;
+        texture.width = width;
+        texture.height = height;
+        texture.format = format;
+
+        glGenTextures(1, &texture.id);
+        InvalidateTexture(texture, true);
 
         texture.isValid = true;
         return texture;
@@ -38,14 +45,6 @@ namespace Graphics
         texture.path = path;
         texture.format = format;
 
-        glGenTextures(1, &texture.id);
-        glBindTexture(GL_TEXTURE_2D, texture.id);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
         stbi_set_flip_vertically_on_load(true);
         texture.data = stbi_load(path, (s32*)&texture.width, (s32*)&texture.height, (s32*)&texture.channelCount, 0);
         if (texture.data == NULL)
@@ -54,14 +53,8 @@ namespace Graphics
             return (Texture){.isValid = false};
         }
 
-        u32 glFormat = GetGLTextureFormat(texture.format);
-        u32 internalFormat = GetInternalTextureFormat(texture.format, false);
-        u32 dataType = GetTextureDataType(texture.format);
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, texture.width, texture.height, 0, glFormat, dataType,
-                     texture.data);
-
-        glGenerateMipmap(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        glGenTextures(1, &texture.id);
+        InvalidateTexture(texture, false);
 
         texture.isValid = true;
         INFO("Successfully loaded texture %s", path);

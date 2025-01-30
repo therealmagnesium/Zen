@@ -7,6 +7,7 @@ namespace Graphics
     {
         float speed = 8.f;
         float lookSensitivity = 0.1f;
+        bool isLocked = false;
         glm::vec3 position = glm::vec3(0.f);
         glm::vec3 rotation = glm::vec3(-90.f, 0.f, 0.f);
         glm::vec3 up = glm::vec3(0.f, 1.f, 0.f);

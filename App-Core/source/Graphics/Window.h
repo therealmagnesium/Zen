@@ -16,8 +16,9 @@ namespace Graphics
     struct Window
     {
         WindowSpecification specification;
-        void* context;
-        SDL_Window* handle;
+        bool isResizing = false;
+        void* context = NULL;
+        SDL_Window* handle = NULL;
     };
 
     Window CreateWindow(const WindowSpecification& spec);

@@ -22,14 +22,18 @@ void SceneViewportPanel::Display(Framebuffer& framebuffer)
 
     ImGui::Begin("Scene Viewport");
     {
+        Camera* primaryCamera = Renderer->GetPrimaryCamera();
+        primaryCamera->isLocked = !ImGui::IsWindowHovered();
+
         s_drawList = ImGui::GetWindowDrawList();
-        s_drawList->AddCallback(DrawCallback, nullptr);
+        s_drawList->AddCallback(DrawCallback, NULL);
 
         ImVec2 aspectSize = this->GetLargestViewportSize();
         ImVec2 windowPosition = this->GetCenteredViewportPosition(aspectSize);
 
         ImGui::SetCursorPos(windowPosition);
         ImGui::Image((void*)displayTexture, aspectSize, ImVec2(0, 1), ImVec2(1, 0));
+        s_drawList->AddCallback(ImDrawCallback_ResetRenderState, NULL);
     }
     ImGui::End();
 }

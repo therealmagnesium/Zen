@@ -24,6 +24,7 @@ namespace Graphics
 
     Framebuffer CreateFramebuffer(u8 numAttachments);
     void ApplyFramebufferAttachments(Framebuffer& framebuffer);
+    void ResizeFramebuffer(Framebuffer& framebuffer, u32 width, u32 height);
     void BindFramebuffer(Framebuffer& framebuffer);
     void UnbindFramebuffer();
     void DestroyFramebuffer(Framebuffer& framebuffer);
