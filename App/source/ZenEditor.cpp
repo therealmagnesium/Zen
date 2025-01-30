@@ -132,7 +132,7 @@ void ZenEditor::SetupSkybox()
 void ZenEditor::SetupGameObjects()
 {
     m_entity = m_activeScene.AddEntity("Entity");
-    m_entity->AddComponent<MeshComponent>(cubeMesh);
+    m_entity->AddComponent<MeshComponent>(miiMesh);
 }
 
 void ZenEditor::SetupAssets()

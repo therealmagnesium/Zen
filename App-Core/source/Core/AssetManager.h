@@ -16,6 +16,7 @@ namespace Core
         void Shutdown();
 
         Graphics::Mesh* GetMesh(const char* name);
+        std::vector<std::string> GetAllMeshNames();
         void AddMesh(const char* name, const char* path);
 
     private:

@@ -42,6 +42,17 @@ namespace Core
         return mesh;
     }
 
+    std::vector<std::string> AssetResourceManager::GetAllMeshNames()
+    {
+        std::vector<std::string> meshNames;
+        meshNames.reserve(m_meshes.size());
+
+        for (auto& [name, mesh] : m_meshes)
+            meshNames.push_back(name);
+
+        return meshNames;
+    }
+
     void AssetResourceManager::AddMesh(const char* name, const char* path)
     {
         if (m_meshes.find(name) != m_meshes.end())
@@ -50,6 +61,8 @@ namespace Core
             return;
         }
 
-        m_meshes[name] = Graphics::LoadMesh(path);
+        Graphics::Mesh mesh = Graphics::LoadMesh(path);
+        mesh.name = name;
+        m_meshes[name] = mesh;
     }
 }

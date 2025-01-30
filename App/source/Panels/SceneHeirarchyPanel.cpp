@@ -1,15 +1,17 @@
 #include "SceneHeirarchyPanel.h"
+
+#include <Zen.h>
 #include <imgui.h>
 #include <glm/gtc/type_ptr.hpp>
 
 using namespace Core;
 using namespace Graphics;
 
+static const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed |
+                                                ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_AllowItemOverlap;
 template <typename T, typename UIFunc>
 static void DrawComponent(const char* name, std::shared_ptr<Entity>& entity, UIFunc uiFunction)
 {
-    const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed |
-                                             ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_AllowItemOverlap;
     if (entity->HasComponent<T>())
     {
         auto& component = entity->GetComponent<T>();
@@ -152,5 +154,34 @@ void SceneHeirarchyPanel::DrawComponents(std::shared_ptr<Entity>& entity)
         ImGui::DragFloat3("Position", glm::value_ptr(component.position), 0.1f);
         ImGui::DragFloat3("Rotation", glm::value_ptr(component.rotation), 0.1f);
         ImGui::DragFloat3("Scale", glm::value_ptr(component.scale), 0.1f);
+    });
+
+    DrawComponent<MeshComponent>("Mesh", entity, [&](MeshComponent& component) {
+        std::vector<std::string> meshNameList = AssetManager->GetAllMeshNames();
+
+        if (ImGui::Button("Select mesh"))
+            ImGui::OpenPopup("Mesh Select Popup");
+
+        if (ImGui::BeginPopup("Mesh Select Popup"))
+        {
+            ImGui::SeparatorText("Mesh list");
+
+            for (u32 i = 0; i < meshNameList.size(); i++)
+            {
+                if (ImGui::Selectable(meshNameList[i].c_str()))
+                    component.mesh = AssetManager->GetMesh(meshNameList[i].c_str());
+            }
+
+            ImGui::EndPopup();
+        }
+
+        if (component.mesh != NULL)
+        {
+            ImGui::SameLine();
+            ImGui::Text("%s", std::find(meshNameList.begin(), meshNameList.end(), component.mesh->name)->c_str());
+
+            ImGui::SeparatorText("Material");
+            ImGui::ColorEdit3("Diffuse", glm::value_ptr(component.mesh->material.diffuse));
+        }
     });
 }
