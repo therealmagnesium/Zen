@@ -10,8 +10,8 @@ namespace Core
 {
     void Scene::Initialize()
     {
-        m_editorCamera.position = glm::vec3(-3.1f, 1.7f, 3.7f);
-        m_editorCamera.rotation = glm::vec3(-47.3f, -20.4f, 0.f);
+        m_editorCamera.position = glm::vec3(12.135f, 1.108f, 14.209f);
+        m_editorCamera.rotation = glm::vec3(-141.3f, -2.5f, 0.f);
         Graphics::Renderer->SetPrimaryCamera(&m_editorCamera);
     }
 

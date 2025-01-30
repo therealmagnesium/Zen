@@ -6,10 +6,6 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 
-static Mesh* cubeMesh = NULL;
-static Mesh* miiMesh = NULL;
-static Mesh* collectableMesh = NULL;
-
 static Shader postProcessingShader;
 static Shader skyboxShder;
 static Shader instancingShader;
@@ -64,7 +60,7 @@ void ZenEditor::OnRender()
     if (Renderer->GetPrimaryCamera() != NULL)
     {
         Renderer->CullFace(FaceCull::Front);
-        Renderer->DrawSkybox(m_skybox, *cubeMesh, skyboxShder);
+        Renderer->DrawSkybox(m_skybox, AssetManager->GetMesh("Cube"), skyboxShder);
 
         BindShader(instancingShader);
 
@@ -132,18 +128,15 @@ void ZenEditor::SetupSkybox()
 void ZenEditor::SetupGameObjects()
 {
     m_entity = m_activeScene.AddEntity("Entity");
-    m_entity->AddComponent<MeshComponent>(miiMesh);
+    m_entity->AddComponent<MeshComponent>(AssetManager->GetMesh("Jupiter"));
 }
 
 void ZenEditor::SetupAssets()
 {
-    AssetManager->AddMesh("Cube", "assets/models/cube.glb");
-    AssetManager->AddMesh("Mii", "assets/models/mii.fbx");
     AssetManager->AddMesh("Collectable", "assets/models/collectable.glb");
-
-    cubeMesh = AssetManager->GetMesh("Cube");
-    miiMesh = AssetManager->GetMesh("Mii");
-    collectableMesh = AssetManager->GetMesh("Collectable");
-
-    cubeMesh->material.diffuse = glm::vec3(0.8f, 0.7f, 0.2f);
+    AssetManager->AddMesh("Cone", "assets/models/cone.glb");
+    AssetManager->AddMesh("Cube", "assets/models/cube.glb");
+    AssetManager->AddMesh("Jupiter", "assets/models/jupiter.fbx");
+    AssetManager->AddMesh("Mii", "assets/models/mii.fbx");
+    AssetManager->AddMesh("Sphere", "assets/models/sphere.glb");
 }

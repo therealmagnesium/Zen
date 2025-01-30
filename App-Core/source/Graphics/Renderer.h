@@ -54,7 +54,7 @@ namespace Graphics
 
         void Prepare(DirectionalLight& directionalLight, Shader& shader);
         void DrawEntities(Shader& shader);
-        void DrawSkybox(Skybox& skybox, Mesh& cube, Shader& shader);
+        void DrawSkybox(Skybox& skybox, Mesh* cubeMesh, Shader& shader);
 
     private:
         void PrepareMesh(Mesh* mesh, Shader& shader);

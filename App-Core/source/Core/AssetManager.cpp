@@ -18,10 +18,14 @@ namespace Core
 
         AssetManager = this;
         isInitialized = true;
+
+        INFO("Successfully initialized the asset manager");
     }
 
     void AssetResourceManager::Shutdown()
     {
+        INFO("Shutting down the asset manager...");
+
         for (auto& [name, mesh] : m_meshes)
             Graphics::UnloadMesh(mesh);
 
@@ -64,5 +68,7 @@ namespace Core
         Graphics::Mesh mesh = Graphics::LoadMesh(path);
         mesh.name = name;
         m_meshes[name] = mesh;
+
+        INFO("Successfully loaded mesh %s to asset manager", name);
     }
 }

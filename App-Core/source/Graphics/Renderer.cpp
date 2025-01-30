@@ -169,7 +169,7 @@ namespace Graphics
         m_meshTransformsMap.clear();
     }
 
-    void RenderManager::DrawSkybox(Skybox& skybox, Mesh& cube, Shader& shader)
+    void RenderManager::DrawSkybox(Skybox& skybox, Mesh* cubeMesh, Shader& shader)
     {
         assert(m_primaryCamera != NULL);
         glm::mat4 skyboxView = glm::mat4(glm::mat3(m_primaryCamera->view));
@@ -181,23 +181,26 @@ namespace Graphics
         shader.SetMat4("viewMatrix", skyboxView);
         shader.SetMat4("projectionMatrix", m_projection);
 
-        BindVertexArray(cube.vertexArray);
-        BindIndexBuffer(cube.indexBuffer);
-        BindSkybox(skybox);
+        if (cubeMesh != NULL)
+        {
+            BindVertexArray(cubeMesh->vertexArray);
+            BindIndexBuffer(cubeMesh->indexBuffer);
+            BindSkybox(skybox);
 
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glEnableVertexAttribArray(2);
+            glEnableVertexAttribArray(0);
+            glEnableVertexAttribArray(1);
+            glEnableVertexAttribArray(2);
 
-        glDrawElements(GL_TRIANGLES, cube.indexCount, GL_UNSIGNED_INT, NULL);
+            glDrawElements(GL_TRIANGLES, cubeMesh->indexCount, GL_UNSIGNED_INT, NULL);
 
-        glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
-        glDisableVertexAttribArray(2);
+            glDisableVertexAttribArray(0);
+            glDisableVertexAttribArray(1);
+            glDisableVertexAttribArray(2);
 
-        UnbindSkybox();
-        UnbindIndexBuffer();
-        UnbindVertexArray();
+            UnbindSkybox();
+            UnbindIndexBuffer();
+            UnbindVertexArray();
+        }
 
         UnbindShader();
         WriteDepth(true);

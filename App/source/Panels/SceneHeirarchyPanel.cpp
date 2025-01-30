@@ -3,6 +3,7 @@
 #include <Zen.h>
 #include <imgui.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <algorithm>
 
 using namespace Core;
 using namespace Graphics;
