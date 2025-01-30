@@ -34,6 +34,8 @@ namespace Core
         m_renderer.Initialize();
         m_renderer.SetClearColor(0.11f, 0.115f, 0.12f);
 
+        m_assetManager.Initialize();
+
         UI::SetupContext();
 
         INFO("Successfully initialized the application");
@@ -41,9 +43,10 @@ namespace Core
 
     Application::~Application()
     {
-        Graphics::DestroyWindow(m_window);
-        UI::DestroyContext();
         m_renderer.Shutdown();
+        m_assetManager.Shutdown();
+        UI::DestroyContext();
+        Graphics::DestroyWindow(m_window);
     }
 
     void Application::Run()

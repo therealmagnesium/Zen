@@ -6,9 +6,9 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 
-static Mesh cubeMesh;
-static Mesh miiMesh;
-static Mesh collectableMesh;
+static Mesh* cubeMesh = NULL;
+static Mesh* miiMesh = NULL;
+static Mesh* collectableMesh = NULL;
 
 static Shader postProcessingShader;
 static Shader skyboxShder;
@@ -18,10 +18,7 @@ static const char* skyboxTexturePaths[6];
 
 ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
 {
-    cubeMesh = LoadMesh("assets/models/cube.glb");
-    cubeMesh.material.diffuse = glm::vec3(0.8f, 0.7f, 0.2f);
-    miiMesh = LoadMesh("assets/models/mii.fbx");
-    collectableMesh = LoadMesh("assets/models/collectable.glb");
+    this->SetupAssets();
 
     m_activeScene.Initialize();
 
@@ -52,10 +49,6 @@ void ZenEditor::OnShutdown()
     UnloadShader(instancingShader);
     UnloadShader(skyboxShder);
     UnloadShader(postProcessingShader);
-
-    UnloadMesh(cubeMesh);
-    UnloadMesh(miiMesh);
-    UnloadMesh(collectableMesh);
 }
 
 void ZenEditor::OnUpdate()
@@ -71,7 +64,7 @@ void ZenEditor::OnRender()
     if (Renderer->GetPrimaryCamera() != NULL)
     {
         Renderer->CullFace(FaceCull::Front);
-        Renderer->DrawSkybox(m_skybox, cubeMesh, skyboxShder);
+        Renderer->DrawSkybox(m_skybox, *cubeMesh, skyboxShder);
 
         BindShader(instancingShader);
 
@@ -139,5 +132,18 @@ void ZenEditor::SetupSkybox()
 void ZenEditor::SetupGameObjects()
 {
     m_entity = m_activeScene.AddEntity("Entity");
-    m_entity->AddComponent<MeshComponent>(&cubeMesh);
+    m_entity->AddComponent<MeshComponent>(cubeMesh);
+}
+
+void ZenEditor::SetupAssets()
+{
+    AssetManager->AddMesh("Cube", "assets/models/cube.glb");
+    AssetManager->AddMesh("Mii", "assets/models/mii.fbx");
+    AssetManager->AddMesh("Collectable", "assets/models/collectable.glb");
+
+    cubeMesh = AssetManager->GetMesh("Cube");
+    miiMesh = AssetManager->GetMesh("Mii");
+    collectableMesh = AssetManager->GetMesh("Collectable");
+
+    cubeMesh->material.diffuse = glm::vec3(0.8f, 0.7f, 0.2f);
 }

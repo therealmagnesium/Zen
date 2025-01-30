@@ -19,6 +19,7 @@ public:
     void OnShutdown() override;
 
 private:
+    void SetupAssets();
     void SetupShaders();
     void SetupSkybox();
     void SetupGameObjects();

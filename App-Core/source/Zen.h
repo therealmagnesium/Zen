@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Application.h"
+#include "Core/AssetManager.h"
 #include "Core/Base.h"
 #include "Core/Components.h"
 #include "Core/Entity.h"

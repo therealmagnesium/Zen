@@ -1,7 +1,7 @@
 #pragma once
+#include "Core/AssetManager.h"
 #include "Core/Base.h"
 
-#include "Graphics/Framebuffer.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/Window.h"
 
@@ -41,6 +41,7 @@ namespace Core
     private:
         bool m_isRunning = false;
         ApplicationSpecification m_specification;
+        AssetResourceManager m_assetManager;
         Graphics::RenderManager m_renderer;
         Graphics::Window m_window;
     };
