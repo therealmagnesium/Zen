@@ -39,8 +39,6 @@ links({
 	"imgui",
 	"stb_image",
 	"nfd",
-	"gtk-3",
-	"glib-2.0",
 	"assimp",
 	"yaml-cpp",
 })
