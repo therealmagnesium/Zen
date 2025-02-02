@@ -4,6 +4,7 @@ project("Application")
 kind("ConsoleApp")
 language("C++")
 cppdialect("C++17")
+systemversion("latest")
 
 targetdir("../bin/" .. outputdir .. "/%{prj.name}")
 objdir("../build/" .. outputdir .. "/%{prj.name}")
@@ -50,11 +51,22 @@ postbuildcommands({
 	"cp ../imgui.ini %{cfg.buildtarget.directory}",
 })
 
-filter("system:Unix")
-system("linux")
-systemversion("latest")
+filter("system:linux")
+links({
+	"gtk-3",
+	"glib-2.0",
+	"gobject-2.0",
+})
 defines({
 	"PLATFORM_LINUX",
+})
+
+filter("system:windows")
+links({
+	"comctl32",
+})
+defines({
+	"PLATFORM_WINDOWS",
 })
 
 filter("configurations:Debug")

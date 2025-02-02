@@ -4,6 +4,7 @@ project("App-Core")
 kind("StaticLib")
 language("C++")
 cppdialect("C++17")
+systemversion("latest")
 
 targetdir("../bin/" .. outputdir .. "/%{prj.name}")
 objdir("../build/" .. outputdir .. "/%{prj.name}")
@@ -43,11 +44,22 @@ links({
 	"yaml-cpp",
 })
 
-filter("system:Unix")
-system("linux")
-systemversion("latest")
+filter("system:linux")
+links({
+	"gtk-3",
+	"glib-2.0",
+	"gobject-2.0",
+})
 defines({
 	"PLATFORM_LINUX",
+})
+
+filter("system:windows")
+links({
+	"comctl32",
+})
+defines({
+	"PLATFORM_WINDOWS",
 })
 
 filter({ "configurations:Debug" })
