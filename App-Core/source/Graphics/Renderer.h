@@ -31,6 +31,7 @@ namespace Graphics
         RenderManager() = default;
 
         inline float GetExposure() const { return m_exposure; }
+        inline float GetGammaCorrection() const { return m_gammaCorrection; }
         inline glm::mat4& GetProjection() { return m_projection; }
         inline Camera* GetPrimaryCamera() const { return m_primaryCamera; }
 
@@ -64,6 +65,7 @@ namespace Graphics
         Camera* m_primaryCamera = NULL;
 
         float m_exposure = 1.f;
+        float m_gammaCorrection = 2.2f;
         glm::vec3 m_clearColor = glm::vec3(1.f);
         glm::mat4 m_projection = glm::mat4(1.f);
 

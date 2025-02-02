@@ -32,8 +32,6 @@ ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
 
     m_sceneHeirarchyPanel.SetContext(&m_activeScene);
     m_sceneViewportPanel.SetContext(&m_activeScene);
-
-    SceneViewportPanel::SetPostFXShader(&postProcessingShader);
 }
 
 void ZenEditor::OnShutdown()
@@ -79,16 +77,10 @@ void ZenEditor::OnRender()
 
 void ZenEditor::OnRenderUI()
 {
-    UI::BeginFrame();
-
     ImGui::DockSpaceOverViewport();
 
-    m_sceneViewportPanel.Display(m_framebuffer);
     m_sceneHeirarchyPanel.Display();
-
-    UI::EndFrame();
-
-    UI::RenderFrame();
+    m_sceneViewportPanel.Display(m_framebuffer, postProcessingShader);
 }
 
 void ZenEditor::SetupShaders()

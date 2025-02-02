@@ -170,19 +170,18 @@ void SceneHeirarchyPanel::DrawComponents(std::shared_ptr<Entity>& entity)
             for (u32 i = 0; i < meshNameList.size(); i++)
             {
                 if (ImGui::Selectable(meshNameList[i].c_str()))
-                    component.mesh = AssetManager->GetMesh(meshNameList[i].c_str());
+                    component.mesh = *AssetManager->GetMesh(meshNameList[i].c_str());
             }
 
             ImGui::EndPopup();
         }
 
-        if (component.mesh != NULL)
-        {
-            ImGui::SameLine();
-            ImGui::Text("%s", std::find(meshNameList.begin(), meshNameList.end(), component.mesh->name)->c_str());
+        auto meshName = std::find(meshNameList.begin(), meshNameList.end(), component.mesh.name);
+        ImGui::SameLine();
 
-            ImGui::SeparatorText("Material");
-            ImGui::ColorEdit3("Diffuse", glm::value_ptr(component.mesh->material.diffuse));
-        }
+        ImGui::Text("%s", (meshName != meshNameList.end()) ? meshName->c_str() : "None");
+
+        ImGui::SeparatorText("Material");
+        ImGui::ColorEdit3("Diffuse", glm::value_ptr(component.mesh.material.diffuse));
     });
 }

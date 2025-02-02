@@ -49,9 +49,9 @@ namespace Graphics
             return val;
         }
 
-        void SetViewport(u32 width, u32 height)
+        void SetViewport(u32 x, u32 y, u32 width, u32 height)
         {
-            glViewport(0, 0, width, height);
+            glViewport(x, y, width, height);
         }
 
         void SendDataToBuffer(VertexIdentifier& buffer, BufferType type, void* data, u64 size)

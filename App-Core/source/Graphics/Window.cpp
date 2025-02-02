@@ -121,7 +121,6 @@ namespace Graphics
                             appInfo.windowWidth = event.window.data1;
                             appInfo.windowHeight = event.window.data2;
 
-                            RenderCommand::SetViewport(appInfo.windowWidth, appInfo.windowHeight);
                             Renderer->CalculateProjection();
 
                             INFO("Resized window to %dx%d", appInfo.windowWidth, appInfo.windowHeight);

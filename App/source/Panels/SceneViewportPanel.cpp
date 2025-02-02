@@ -9,14 +9,14 @@
 using namespace Core;
 using namespace Graphics;
 
-ImDrawList* SceneViewportPanel::s_drawList = NULL;
-Shader* SceneViewportPanel::s_postProcessingShader = NULL;
-Framebuffer* SceneViewportPanel::s_framebuffer = NULL;
-float SceneViewportPanel::s_gammaCorrection = 2.2f;
+static ImDrawList* s_drawList = NULL;
+static Shader* s_postProcessingShader = NULL;
+static Framebuffer* s_framebuffer = NULL;
 
-void SceneViewportPanel::Display(Framebuffer& framebuffer)
+void SceneViewportPanel::Display(Framebuffer& framebuffer, Shader& postFXShader)
 {
     s_framebuffer = &framebuffer;
+    s_postProcessingShader = &postFXShader;
 
     u64 displayTexture = framebuffer.attachments[0].id;
 
@@ -55,7 +55,7 @@ void SceneViewportPanel::DrawCallback(const ImDrawList*, const ImDrawCmd*)
 
         s_postProcessingShader->SetInt("screenTexture", 0);
         s_postProcessingShader->SetMat4("projectionMatrix", projection);
-        s_postProcessingShader->SetFloat("gamma", s_gammaCorrection);
+        s_postProcessingShader->SetFloat("gamma", Renderer->GetGammaCorrection());
         s_postProcessingShader->SetFloat("exposure", Renderer->GetExposure());
     }
 }

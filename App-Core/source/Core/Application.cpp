@@ -60,7 +60,12 @@ namespace Core
             m_renderer.Clear(true, false, false);
 
             this->OnRender();
+
+            UI::BeginFrame();
             this->OnRenderUI();
+            UI::EndFrame();
+
+            UI::RenderFrame();
 
             m_renderer.EndDrawing();
         }

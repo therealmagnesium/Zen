@@ -18,6 +18,7 @@
 #include "Graphics/Material.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/Renderer.h"
+#include "Graphics/RenderCommand.h"
 #include "Graphics/Shader.h"
 #include "Graphics/Skybox.h"
 #include "Graphics/Texture.h"

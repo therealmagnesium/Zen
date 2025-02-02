@@ -44,9 +44,9 @@ namespace Core
     struct MeshComponent
     {
         bool isEnabled = false;
-        Graphics::Mesh* mesh = NULL;
+        Graphics::Mesh mesh;
 
         MeshComponent() = default;
-        MeshComponent(Graphics::Mesh* mesh) { this->mesh = mesh; };
+        MeshComponent(Graphics::Mesh* mesh) { this->mesh = *mesh; };
     };
 }

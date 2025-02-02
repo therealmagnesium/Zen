@@ -104,29 +104,26 @@ namespace Graphics
             auto& tc = entity->GetComponent<Core::TransformComponent>();
             auto& mc = entity->GetComponent<Core::MeshComponent>();
 
-            if (mc.mesh != NULL)
+            std::vector<std::shared_ptr<Core::Entity>>& batch = m_meshEntitiesMap[&mc.mesh];
+            std::vector<glm::mat4>& transformsBatch = m_meshTransformsMap[&mc.mesh];
+            mc.mesh.normalMatrix = glm::transpose(glm::inverse(tc.transform));
+
+            if (batch.size() != 0)
+                batch.push_back(entity);
+            else
             {
-                std::vector<std::shared_ptr<Core::Entity>>& batch = m_meshEntitiesMap[mc.mesh];
-                std::vector<glm::mat4>& transformsBatch = m_meshTransformsMap[mc.mesh];
-                mc.mesh->normalMatrix = glm::transpose(glm::inverse(tc.transform));
+                std::vector<std::shared_ptr<Core::Entity>> newBatch;
+                newBatch.push_back(entity);
+                m_meshEntitiesMap[&mc.mesh] = newBatch;
+            }
 
-                if (batch.size() != 0)
-                    batch.push_back(entity);
-                else
-                {
-                    std::vector<std::shared_ptr<Core::Entity>> newBatch;
-                    newBatch.push_back(entity);
-                    m_meshEntitiesMap[mc.mesh] = newBatch;
-                }
-
-                if (transformsBatch.size() != 0)
-                    transformsBatch.push_back(tc.transform);
-                else
-                {
-                    std::vector<glm::mat4> newBatch;
-                    newBatch.push_back(tc.transform);
-                    m_meshTransformsMap[mc.mesh] = newBatch;
-                }
+            if (transformsBatch.size() != 0)
+                transformsBatch.push_back(tc.transform);
+            else
+            {
+                std::vector<glm::mat4> newBatch;
+                newBatch.push_back(tc.transform);
+                m_meshTransformsMap[&mc.mesh] = newBatch;
             }
         }
     }
