@@ -25,7 +25,6 @@ private:
     void SetupGameObjects();
 
 private:
-    DirectionalLight m_directionalLight;
     Skybox m_skybox;
     Framebuffer m_framebuffer;
     Scene m_activeScene;
@@ -33,5 +32,7 @@ private:
     SceneHeirarchyPanel m_sceneHeirarchyPanel;
     SceneViewportPanel m_sceneViewportPanel;
 
+    std::shared_ptr<Entity> m_camera;
+    std::shared_ptr<Entity> m_directionalLight;
     std::shared_ptr<Entity> m_entity;
 };

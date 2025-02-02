@@ -13,6 +13,11 @@ static ImDrawList* s_drawList = NULL;
 static Shader* s_postProcessingShader = NULL;
 static Framebuffer* s_framebuffer = NULL;
 
+void SceneViewportPanel::SetContext(Scene* scene)
+{
+    m_context = scene;
+}
+
 void SceneViewportPanel::Display(Framebuffer& framebuffer, Shader& postFXShader)
 {
     s_framebuffer = &framebuffer;
@@ -22,8 +27,8 @@ void SceneViewportPanel::Display(Framebuffer& framebuffer, Shader& postFXShader)
 
     ImGui::Begin("Scene Viewport");
     {
-        Camera* primaryCamera = Renderer->GetPrimaryCamera();
-        primaryCamera->isLocked = !ImGui::IsWindowHovered();
+        Camera& editorCamera = m_context->GetEditorCamera();
+        editorCamera.isLocked = !ImGui::IsWindowHovered();
 
         s_drawList = ImGui::GetWindowDrawList();
         s_drawList->AddCallback(DrawCallback, NULL);

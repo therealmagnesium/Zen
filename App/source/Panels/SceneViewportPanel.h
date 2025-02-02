@@ -10,8 +10,7 @@ class SceneViewportPanel
 public:
     SceneViewportPanel() = default;
 
-    inline void SetContext(Scene* scene) { m_context = scene; }
-
+    void SetContext(Scene* scene);
     void Display(Framebuffer& framebuffer, Shader& postFXShader);
 
 private:

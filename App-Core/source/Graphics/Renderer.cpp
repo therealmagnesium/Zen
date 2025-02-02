@@ -54,7 +54,7 @@ namespace Graphics
     {
         Core::ApplicationSpecification& appInfo = Core::App->GetSpecification();
         float aspectRatio = appInfo.windowWidth / (float)appInfo.windowHeight;
-        m_projection = glm::perspective(glm::radians(45.f), aspectRatio, 0.1f, 100.f);
+        m_projection = glm::perspective(glm::radians(m_primaryCamera->fov), aspectRatio, 0.1f, 100.f);
     }
 
     void RenderManager::BeginDrawing()
@@ -128,14 +128,13 @@ namespace Graphics
         }
     }
 
-    void RenderManager::Prepare(DirectionalLight& directionalLight, Shader& shader)
+    void RenderManager::Prepare(Shader& shader)
     {
         if (m_primaryCamera != NULL)
         {
             shader.SetVec3("cameraPosition", m_primaryCamera->position);
             shader.SetMat4("viewMatrix", m_primaryCamera->view);
             shader.SetMat4("projectionMatrix", m_projection);
-            shader.SetLight("directionalLight", directionalLight);
         }
     }
 

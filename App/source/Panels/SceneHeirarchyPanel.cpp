@@ -147,6 +147,18 @@ void SceneHeirarchyPanel::DrawComponents(std::shared_ptr<Entity>& entity)
             ImGui::CloseCurrentPopup();
         }
 
+        if (ImGui::MenuItem("Light Source (Directional)"))
+        {
+            m_selectionContext->AddComponent<DirectionalLightComponent>();
+            ImGui::CloseCurrentPopup();
+        }
+
+        if (ImGui::MenuItem("Perspective Camera"))
+        {
+            m_selectionContext->AddComponent<CameraComponent>();
+            ImGui::CloseCurrentPopup();
+        }
+
         ImGui::EndPopup();
     }
     ImGui::PopItemWidth();
@@ -183,5 +195,17 @@ void SceneHeirarchyPanel::DrawComponents(std::shared_ptr<Entity>& entity)
 
         ImGui::SeparatorText("Material");
         ImGui::ColorEdit3("Diffuse", glm::value_ptr(component.mesh.material.diffuse));
+    });
+
+    DrawComponent<DirectionalLightComponent>("Directional Light", entity, [&](DirectionalLightComponent& component) {
+        ImGui::DragFloat("Intensity", &component.light.intensity, 0.1f);
+        ImGui::DragFloat3("Direction", glm::value_ptr(component.light.direction), 0.1f, -1.f, 1.f);
+        ImGui::ColorEdit3("Color", glm::value_ptr(component.light.color));
+    });
+
+    DrawComponent<CameraComponent>("Perspective Camera", entity, [&](CameraComponent& component) {
+        ImGui::Checkbox("Is Primary?", &component.isPrimary);
+        ImGui::Checkbox("Is Locked?", &component.camera.isLocked);
+        ImGui::DragFloat("FOV", &component.camera.fov);
     });
 }

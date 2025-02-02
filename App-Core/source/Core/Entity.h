@@ -9,7 +9,7 @@
 
 namespace Core
 {
-    typedef std::tuple<TransformComponent, MeshComponent> ComponentTuple;
+    typedef std::tuple<TransformComponent, MeshComponent, DirectionalLightComponent, CameraComponent> ComponentTuple;
 
     class Entity
     {

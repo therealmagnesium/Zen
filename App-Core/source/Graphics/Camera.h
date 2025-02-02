@@ -6,6 +6,7 @@ namespace Graphics
     struct Camera
     {
         float speed = 8.f;
+        float fov = 45.f;
         float lookSensitivity = 0.1f;
         bool isLocked = false;
         glm::vec3 position = glm::vec3(0.f);

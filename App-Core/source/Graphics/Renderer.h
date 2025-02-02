@@ -53,7 +53,7 @@ namespace Graphics
 
         void ProcessEntity(std::shared_ptr<Core::Entity>& entity);
 
-        void Prepare(DirectionalLight& directionalLight, Shader& shader);
+        void Prepare(Shader& shader);
         void DrawEntities(Shader& shader);
         void DrawSkybox(Skybox& skybox, Mesh* cubeMesh, Shader& shader);
 

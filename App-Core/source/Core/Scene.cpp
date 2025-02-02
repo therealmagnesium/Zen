@@ -15,15 +15,41 @@ namespace Core
         Graphics::Renderer->SetPrimaryCamera(&m_editorCamera);
     }
 
-    void Scene::Update()
+    void Scene::Update(Graphics::Shader& shader)
     {
         m_entityManager.Update();
+        Graphics::Renderer->SetPrimaryCamera(&m_editorCamera);
 
         Graphics::UpdateCameraController(m_editorCamera);
         Graphics::UpdateCamera(m_editorCamera);
 
         if (IsKeyPressed(KEY_F8))
             Graphics::LogCameraInfo(m_editorCamera);
+
+        for (auto& entity : m_entityManager.GetEntities())
+        {
+            auto& tc = entity->GetComponent<TransformComponent>();
+            if (entity->HasComponent<DirectionalLightComponent>())
+            {
+                auto& dlc = entity->GetComponent<DirectionalLightComponent>();
+
+                Graphics::BindShader(shader);
+                shader.SetLight("directionalLight", dlc.light);
+                Graphics::UnbindShader();
+            }
+
+            if (entity->HasComponent<CameraComponent>())
+            {
+                auto& cc = entity->GetComponent<CameraComponent>();
+                cc.camera.position = tc.position;
+                cc.camera.rotation = tc.rotation;
+
+                if (cc.isPrimary)
+                    Graphics::Renderer->SetPrimaryCamera(&cc.camera);
+
+                Graphics::UpdateCamera(cc.camera);
+            }
+        }
     }
 
     std::shared_ptr<Entity> Scene::AddEntity(const char* tag)

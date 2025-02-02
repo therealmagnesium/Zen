@@ -1,6 +1,7 @@
 #pragma once
+#include "Graphics/Camera.h"
+#include "Graphics/Lights.h"
 #include "Graphics/Mesh.h"
-#include "Graphics/Shader.h"
 
 #include <glm/glm.hpp>
 
@@ -48,5 +49,24 @@ namespace Core
 
         MeshComponent() = default;
         MeshComponent(Graphics::Mesh* mesh) { this->mesh = *mesh; };
+    };
+
+    struct DirectionalLightComponent
+    {
+        bool isEnabled = false;
+        Graphics::DirectionalLight light;
+
+        DirectionalLightComponent() = default;
+        DirectionalLightComponent(const glm::vec3& direction) { light.direction = direction; }
+    };
+
+    struct CameraComponent
+    {
+        bool isEnabled = false;
+        bool isPrimary = false;
+        Graphics::Camera camera;
+
+        CameraComponent() = default;
+        CameraComponent(float fov) { camera.fov = fov; }
     };
 }

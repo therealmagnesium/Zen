@@ -18,9 +18,6 @@ ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
 
     m_activeScene.Initialize();
 
-    m_directionalLight.intensity = 3.f;
-    m_directionalLight.direction = glm::vec3(0.2f, -0.86f, -0.95f);
-
     m_framebuffer = CreateFramebuffer(2);
     m_framebuffer.attachments[0] = CreateEmptyTexture(spec.windowWidth, spec.windowHeight, TextureFormat::RGB16F);
     m_framebuffer.attachments[1] = CreateEmptyTexture(spec.windowWidth, spec.windowHeight, TextureFormat::DepthStencil);
@@ -47,7 +44,7 @@ void ZenEditor::OnShutdown()
 
 void ZenEditor::OnUpdate()
 {
-    m_activeScene.Update();
+    m_activeScene.Update(instancingShader);
 }
 
 void ZenEditor::OnRender()
@@ -62,7 +59,7 @@ void ZenEditor::OnRender()
 
         BindShader(instancingShader);
 
-        Renderer->Prepare(m_directionalLight, instancingShader);
+        Renderer->Prepare(instancingShader);
 
         for (auto& entity : m_activeScene.GetEntities())
             Renderer->ProcessEntity(entity);
@@ -119,6 +116,13 @@ void ZenEditor::SetupSkybox()
 
 void ZenEditor::SetupGameObjects()
 {
+    m_camera = m_activeScene.AddEntity("Main Camera");
+    auto& cc = m_camera->AddComponent<CameraComponent>();
+    Renderer->SetPrimaryCamera(&cc.camera);
+
+    m_directionalLight = m_activeScene.AddEntity("Directional Light");
+    m_directionalLight->AddComponent<DirectionalLightComponent>(glm::vec3(0.2f, -0.86f, -0.95f));
+
     m_entity = m_activeScene.AddEntity("Entity");
     m_entity->AddComponent<MeshComponent>(AssetManager->GetMesh("Jupiter"));
 }
