@@ -1,0 +1,59 @@
+Scene: Untitled
+Entities:
+  - Entity: 12837192873
+    Tag: Main Camera
+    Transform Component:
+      Position: [0.274, 3.969, 32.027]
+      Rotation: [-91, -10.6, 0]
+      Scale: [1, 1, 1]
+    Camera Component:
+      Camera:
+        FOV: 45
+        Speed: 8
+        Direction: [-0.017154533, -0.18395135, -0.9827857]
+        Up: [0, 1, 0]
+        Is Locked?: false
+      Is Primary?: true
+  - Entity: 12837192873
+    Tag: Directional Light
+    Transform Component:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Directional Light Component:
+      Intensity: 2.5
+      Direction: [0.2, -0.86, -0.95]
+      Color: [1, 1, 1]
+  - Entity: 12837192873
+    Tag: Ground
+    Transform Component:
+      Position: [0, 0, -18]
+      Rotation: [0, 0, 0]
+      Scale: [8, 0.5, 50]
+    Mesh Component:
+      Name: Cube
+      Path: assets/models/cube.glb
+      Material:
+        Diffuse: [0.8, 0.8, 0.8]
+  - Entity: 12837192873
+    Tag: Player
+    Transform Component:
+      Position: [-1.8, 2, 22.7]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh Component:
+      Name: Cube
+      Path: assets/models/cube.glb
+      Material:
+        Diffuse: [0.71428573, 0.06067293, 0.06067293]
+  - Entity: 12837192873
+    Tag: Obstacle
+    Transform Component:
+      Position: [0, 2, 0]
+      Rotation: [0, 0, 0]
+      Scale: [2, 1, 1]
+    Mesh Component:
+      Name: Cube
+      Path: assets/models/cube.glb
+      Material:
+        Diffuse: [0.02702701, 0.02702701, 0.02702701]
