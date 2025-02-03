@@ -74,6 +74,7 @@ namespace Graphics
     Mesh LoadMesh(const char* path)
     {
         Mesh mesh;
+        mesh.path = path;
         mesh.material = LoadMaterial(path);
 
         Assimp::Importer importer;

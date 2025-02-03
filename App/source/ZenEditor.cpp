@@ -15,8 +15,7 @@ static const char* skyboxTexturePaths[6];
 ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
 {
     this->SetupAssets();
-
-    m_activeScene.Initialize();
+    this->CreateNewScene(true);
 
     m_framebuffer = CreateFramebuffer(2);
     m_framebuffer.attachments[0] = CreateEmptyTexture(spec.windowWidth, spec.windowHeight, TextureFormat::RGB16F);
@@ -25,10 +24,6 @@ ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
 
     this->SetupShaders();
     this->SetupSkybox();
-    this->SetupGameObjects();
-
-    m_sceneHeirarchyPanel.SetContext(&m_activeScene);
-    m_sceneViewportPanel.SetContext(&m_activeScene);
 }
 
 void ZenEditor::OnShutdown()
@@ -45,6 +40,16 @@ void ZenEditor::OnShutdown()
 void ZenEditor::OnUpdate()
 {
     m_activeScene.Update(instancingShader);
+
+    if (IsKeyDown(KEY_LEFT_CTRL))
+    {
+        if (IsKeyPressed(KEY_N))
+            this->CreateNewScene(true);
+        if (IsKeyPressed(KEY_O))
+            this->OpenSceneDialog();
+        if (IsKeyPressed(KEY_S))
+            this->SaveSceneDialog();
+    }
 }
 
 void ZenEditor::OnRender()
@@ -75,6 +80,25 @@ void ZenEditor::OnRender()
 void ZenEditor::OnRenderUI()
 {
     ImGui::DockSpaceOverViewport();
+
+    if (ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("File"))
+        {
+            if (ImGui::MenuItem("New", "Ctrl+N"))
+                this->CreateNewScene(true);
+            if (ImGui::MenuItem("Load", "Ctrl+O"))
+                this->OpenSceneDialog();
+            if (ImGui::MenuItem("Save", "Ctrl+S"))
+                this->SaveSceneDialog();
+            if (ImGui::MenuItem("Exit"))
+                this->Quit();
+
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMainMenuBar();
+    }
 
     m_sceneHeirarchyPanel.Display();
     m_sceneViewportPanel.Display(m_framebuffer, postProcessingShader);
@@ -114,19 +138,6 @@ void ZenEditor::SetupSkybox()
     m_skybox = LoadSkybox(skyboxTexturePaths, TextureFormat::RGBA);
 }
 
-void ZenEditor::SetupGameObjects()
-{
-    m_camera = m_activeScene.AddEntity("Main Camera");
-    auto& cc = m_camera->AddComponent<CameraComponent>();
-    Renderer->SetPrimaryCamera(&cc.camera);
-
-    m_directionalLight = m_activeScene.AddEntity("Directional Light");
-    m_directionalLight->AddComponent<DirectionalLightComponent>(glm::vec3(0.2f, -0.86f, -0.95f));
-
-    m_entity = m_activeScene.AddEntity("Entity");
-    m_entity->AddComponent<MeshComponent>(AssetManager->GetMesh("Jupiter"));
-}
-
 void ZenEditor::SetupAssets()
 {
     AssetManager->AddMesh("Collectable", "assets/models/collectable.glb");
@@ -135,4 +146,37 @@ void ZenEditor::SetupAssets()
     AssetManager->AddMesh("Jupiter", "assets/models/jupiter.fbx");
     AssetManager->AddMesh("Mii", "assets/models/mii.fbx");
     AssetManager->AddMesh("Sphere", "assets/models/sphere.glb");
+}
+
+void ZenEditor::CreateNewScene(bool addDefaultEntities)
+{
+    m_activeScene = Scene();
+    m_activeScene.Initialize(addDefaultEntities);
+
+    m_sceneHeirarchyPanel.SetContext(&m_activeScene);
+    m_sceneViewportPanel.SetContext(&m_activeScene);
+}
+
+void ZenEditor::OpenSceneDialog()
+{
+    std::string path = FileDialogs::OpenFile("zen", "scenes/");
+
+    if (!path.empty())
+    {
+        this->CreateNewScene(false);
+
+        m_sceneSerializer.SetContext(&m_activeScene);
+        m_sceneSerializer.Deserialize(path.c_str());
+    }
+}
+
+void ZenEditor::SaveSceneDialog()
+{
+    std::string path = FileDialogs::SaveFile("zen", "scenes/");
+
+    if (!path.empty())
+    {
+        m_sceneSerializer.SetContext(&m_activeScene);
+        m_sceneSerializer.Serialize(path.c_str());
+    }
 }

@@ -8,11 +8,21 @@
 
 namespace Core
 {
-    void Scene::Initialize()
+    void Scene::Initialize(bool addDefaultEntities)
     {
         m_editorCamera.position = glm::vec3(12.135f, 1.108f, 14.209f);
         m_editorCamera.rotation = glm::vec3(-141.3f, -2.5f, 0.f);
+        m_editorCamera.speed = 25.f;
         Graphics::Renderer->SetPrimaryCamera(&m_editorCamera);
+
+        if (addDefaultEntities)
+        {
+            std::shared_ptr<Entity> sceneCamera = m_entityManager.AddEntity("Main Camera");
+            sceneCamera->AddComponent<CameraComponent>();
+
+            std::shared_ptr<Entity> directionalLight = m_entityManager.AddEntity("Directional Light");
+            directionalLight->AddComponent<DirectionalLightComponent>(glm::vec3(0.2f, -0.86f, -0.95f));
+        }
     }
 
     void Scene::Update(Graphics::Shader& shader)

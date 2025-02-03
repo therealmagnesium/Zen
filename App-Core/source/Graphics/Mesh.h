@@ -18,6 +18,7 @@ namespace Graphics
         u32 vertexCount = 0;
         u32 indexCount = 0;
         std::string name = "Default";
+        std::string path = "Default";
         bool shouldCullBackface = true;
         glm::mat4 normalMatrix = glm::mat4(1.f);
         std::vector<Vertex> vertices;

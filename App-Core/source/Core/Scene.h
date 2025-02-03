@@ -14,7 +14,7 @@ namespace Core
         inline Graphics::Camera& GetEditorCamera() { return m_editorCamera; }
         inline std::vector<std::shared_ptr<Entity>>& GetEntities() { return m_entityManager.GetEntities(); }
 
-        void Initialize();
+        void Initialize(bool addDefaultEntities);
         void Update(Graphics::Shader& shader);
 
         std::shared_ptr<Entity> AddEntity(const char* tag);

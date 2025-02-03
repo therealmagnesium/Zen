@@ -22,17 +22,19 @@ private:
     void SetupAssets();
     void SetupShaders();
     void SetupSkybox();
-    void SetupGameObjects();
+
+    void CreateNewScene(bool addDefaultEntities);
+    void OpenSceneDialog();
+    void SaveSceneDialog();
 
 private:
     Skybox m_skybox;
     Framebuffer m_framebuffer;
     Scene m_activeScene;
+    SceneSerializer m_sceneSerializer;
 
     SceneHeirarchyPanel m_sceneHeirarchyPanel;
     SceneViewportPanel m_sceneViewportPanel;
 
-    std::shared_ptr<Entity> m_camera;
-    std::shared_ptr<Entity> m_directionalLight;
     std::shared_ptr<Entity> m_entity;
 };
