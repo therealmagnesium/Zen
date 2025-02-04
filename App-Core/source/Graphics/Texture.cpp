@@ -6,7 +6,7 @@
 
 namespace Graphics
 {
-    void InvalidateTexture(Texture& texture, bool isEmptyTexture)
+    void InvalidateTexture(Texture& texture, bool applyGamma)
     {
         glBindTexture(GL_TEXTURE_2D, texture.id);
 
@@ -16,7 +16,7 @@ namespace Graphics
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         u32 glFormat = GetGLTextureFormat(texture.format);
-        u32 internalFormat = GetInternalTextureFormat(texture.format, isEmptyTexture);
+        u32 internalFormat = GetInternalTextureFormat(texture.format, applyGamma);
         u32 dataType = GetTextureDataType(texture.format);
         glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, texture.width, texture.height, 0, glFormat, dataType,
                      texture.data);
@@ -39,7 +39,7 @@ namespace Graphics
         return texture;
     }
 
-    Texture LoadTexture(const char* path, TextureFormat format)
+    Texture LoadTexture(const char* path, TextureFormat format, bool applyGamma)
     {
         Texture texture;
         texture.path = path;
@@ -54,7 +54,7 @@ namespace Graphics
         }
 
         glGenTextures(1, &texture.id);
-        InvalidateTexture(texture, false);
+        InvalidateTexture(texture, applyGamma);
 
         texture.isValid = true;
         INFO("Successfully loaded texture %s", path);
@@ -85,14 +85,14 @@ namespace Graphics
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    u32 GetInternalTextureFormat(TextureFormat format, bool isEmptyTexture)
+    u32 GetInternalTextureFormat(TextureFormat format, bool applyGamma)
     {
         u32 internalFormat = 0;
 
         switch (format)
         {
             case TextureFormat::RGB:
-                internalFormat = (!isEmptyTexture) ? GL_SRGB : GL_RGB;
+                internalFormat = (applyGamma) ? GL_SRGB : GL_RGB;
                 break;
 
             case TextureFormat::RGB16F:
@@ -100,7 +100,7 @@ namespace Graphics
                 break;
 
             case TextureFormat::RGBA:
-                internalFormat = (!isEmptyTexture) ? GL_SRGB_ALPHA : GL_RGBA;
+                internalFormat = (applyGamma) ? GL_SRGB_ALPHA : GL_RGBA;
                 break;
 
             case TextureFormat::Depth:

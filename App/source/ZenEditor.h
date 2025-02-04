@@ -1,4 +1,5 @@
 #pragma once
+#include "Panels/ContentBrowserPanel.h"
 #include "Panels/SceneHeirarchyPanel.h"
 #include "Panels/SceneViewportPanel.h"
 
@@ -33,6 +34,7 @@ private:
     Scene m_activeScene;
     SceneSerializer m_sceneSerializer;
 
+    ContentBrowserPanel m_contentBrowserPanel;
     SceneHeirarchyPanel m_sceneHeirarchyPanel;
     SceneViewportPanel m_sceneViewportPanel;
 

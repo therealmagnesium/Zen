@@ -17,7 +17,7 @@ namespace UI
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
-        io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/rubik/Rubik-Regular.ttf", 18.f);
+        io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/montserrat/Montserrat-Regular.ttf", 20.f);
 
         ImGuiStyle& style = ImGui::GetStyle();
         style.WindowMinSize.x = 380.f;

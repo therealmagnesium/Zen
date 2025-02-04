@@ -43,7 +43,7 @@ namespace Graphics
             formats[i] = framebuffer.attachments[i].format;
             framebuffer.attachments[i].width = width;
             framebuffer.attachments[i].height = height;
-            InvalidateTexture(framebuffer.attachments[i], true);
+            InvalidateTexture(framebuffer.attachments[i], false);
         }
 
         ApplyFramebufferAttachments(framebuffer);

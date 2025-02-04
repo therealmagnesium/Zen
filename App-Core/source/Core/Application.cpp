@@ -45,6 +45,7 @@ namespace Core
     {
         m_renderer.Shutdown();
         m_assetManager.Shutdown();
+
         UI::DestroyContext();
         Graphics::DestroyWindow(m_window);
     }

@@ -22,8 +22,8 @@ namespace Graphics
             stbi_set_flip_vertically_on_load(false);
             skybox.data[i] = stbi_load(paths[i], &skybox.textureWidth, &skybox.textureHeight, &skybox.channelCount, 0);
 
-            u32 internalFormat = GetInternalTextureFormat(textureFormat, true);
-            u32 glFormat = GetInternalTextureFormat(textureFormat, true);
+            u32 internalFormat = GetInternalTextureFormat(textureFormat, false);
+            u32 glFormat = GetGLTextureFormat(textureFormat);
             u32 dataType = GetTextureDataType(textureFormat);
 
             if (skybox.data[i] != NULL)

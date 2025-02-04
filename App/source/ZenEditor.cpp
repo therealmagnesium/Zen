@@ -17,6 +17,8 @@ ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
     this->SetupAssets();
     this->CreateNewScene(true);
 
+    m_contentBrowserPanel.Initialize();
+
     m_framebuffer = CreateFramebuffer(2);
     m_framebuffer.attachments[0] = CreateEmptyTexture(spec.windowWidth, spec.windowHeight, TextureFormat::RGB16F);
     m_framebuffer.attachments[1] = CreateEmptyTexture(spec.windowWidth, spec.windowHeight, TextureFormat::DepthStencil);
@@ -28,6 +30,8 @@ ZenEditor::ZenEditor(const ApplicationSpecification& spec) : Application(spec)
 
 void ZenEditor::OnShutdown()
 {
+    m_contentBrowserPanel.Shutdown();
+
     DestroyFramebuffer(m_framebuffer);
 
     UnloadSkybox(m_skybox);
@@ -100,6 +104,7 @@ void ZenEditor::OnRenderUI()
         ImGui::EndMainMenuBar();
     }
 
+    m_contentBrowserPanel.Display();
     m_sceneHeirarchyPanel.Display();
     m_sceneViewportPanel.Display(m_framebuffer, postProcessingShader);
 }

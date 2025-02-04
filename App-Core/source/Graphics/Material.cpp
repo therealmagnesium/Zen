@@ -44,7 +44,7 @@ namespace Graphics
         // The texture hasn't been loaded yet, so load it.
         if (!skipTextureLoad && aPath.length > 3)
         {
-            Texture texture = LoadTexture(aPath.C_Str(), TextureFormat::RGBA);
+            Texture texture = LoadTexture(aPath.C_Str(), TextureFormat::RGBA, true);
             material.diffuseMap = texture;
             loadedTextures.push_back(texture);
         }
