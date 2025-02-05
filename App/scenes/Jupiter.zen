@@ -1,0 +1,48 @@
+Scene: Untitled
+Entities:
+  - Entity: 12837192873
+    Tag: Main Camera
+    Transform Component:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Camera Component:
+      Camera:
+        FOV: 45
+        Speed: 8
+        Direction: [1, 0, 0]
+        Up: [0, 1, 0]
+        Is Locked?: false
+      Is Primary?: false
+  - Entity: 12837192873
+    Tag: Directional Light
+    Transform Component:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Directional Light Component:
+      Intensity: 2.5
+      Direction: [-1, -0.86, -0.95]
+      Color: [1, 1, 1]
+  - Entity: 12837192873
+    Tag: Jupiter
+    Transform Component:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [2, 2, 2]
+    Mesh Component:
+      Name: Jupiter
+      Path: assets/models/jupiter.fbx
+      Material:
+        Diffuse: [0.8, 0.8, 0.8]
+  - Entity: 12837192873
+    Tag: Mii
+    Transform Component:
+      Position: [0, 10.5, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh Component:
+      Name: Mii
+      Path: assets/models/mii.fbx
+      Material:
+        Diffuse: [0.8, 0.8, 0.8]

@@ -71,4 +71,32 @@ namespace Core
 
         INFO("Successfully loaded mesh %s to asset manager", name);
     }
+
+    Graphics::Material* AssetResourceManager::GetMaterial(const char* name)
+    {
+        Graphics::Material* material = NULL;
+
+        if (m_meshes.find(name) == m_meshes.end())
+        {
+            WARN("Cannot get material %s from asset manager because it hasn't been loaded", name);
+            return material;
+        }
+
+        material = &m_materials[name];
+        return material;
+    }
+
+    void AssetResourceManager::AddMaterial(const char* name, const char* path)
+    {
+        if (m_meshes.find(name) != m_meshes.end())
+        {
+            WARN("Skipping adding material %s to asset manager because it's already loaded", name);
+            return;
+        }
+
+        Graphics::Material material = Graphics::LoadMaterial(path);
+        m_materials[name] = material;
+
+        INFO("Successfully loaded mesh %s to asset manager", name);
+    }
 }

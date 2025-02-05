@@ -172,7 +172,7 @@ void SceneHeirarchyPanel::DrawComponents(std::shared_ptr<Entity>& entity)
     DrawComponent<MeshComponent>("Mesh", entity, [&](MeshComponent& component) {
         std::vector<std::string> meshNameList = AssetManager->GetAllMeshNames();
 
-        if (ImGui::Button("Select mesh"))
+        if (ImGui::Button("Select Mesh"))
             ImGui::OpenPopup("Mesh Select Popup");
 
         if (ImGui::BeginPopup("Mesh Select Popup"))
@@ -193,8 +193,17 @@ void SceneHeirarchyPanel::DrawComponents(std::shared_ptr<Entity>& entity)
 
         ImGui::Text("%s", (meshName != meshNameList.end()) ? meshName->c_str() : "None");
 
+        u64 albedoMapID = component.mesh.material.diffuseMap.id;
         ImGui::SeparatorText("Material");
-        ImGui::ColorEdit3("Diffuse", glm::value_ptr(component.mesh.material.diffuse));
+
+        if (albedoMapID != 0)
+        {
+            ImGui::ImageButton(component.mesh.material.diffuseMap.path.c_str(), (void*)albedoMapID, ImVec2(64.f, 64.f),
+                               ImVec2(0.f, 1.f), ImVec2(1.f, 0.f));
+            ImGui::ColorEdit3("Albedo", glm::value_ptr(component.mesh.material.diffuse));
+        }
+        else
+            ImGui::ColorEdit3("Albedo", glm::value_ptr(component.mesh.material.diffuse));
     });
 
     DrawComponent<DirectionalLightComponent>("Directional Light", entity, [&](DirectionalLightComponent& component) {
