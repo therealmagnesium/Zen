@@ -12,7 +12,7 @@
 
 namespace Graphics
 {
-    u32 Mesh::LoadFlags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices;
+    u32 Mesh::LoadFlags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_PreTransformVertices;
 
     static void UploadMeshData(Mesh& mesh)
     {

@@ -43,11 +43,10 @@ namespace Core
 
     Application::~Application()
     {
+        Graphics::DestroyWindow(m_window);
+        UI::DestroyContext();
         m_renderer.Shutdown();
         m_assetManager.Shutdown();
-
-        UI::DestroyContext();
-        Graphics::DestroyWindow(m_window);
     }
 
     void Application::Run()

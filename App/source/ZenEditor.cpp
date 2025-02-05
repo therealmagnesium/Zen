@@ -145,12 +145,13 @@ void ZenEditor::SetupSkybox()
 
 void ZenEditor::SetupAssets()
 {
-    AssetManager->AddMesh("Collectable", "assets/models/collectable.glb");
-    AssetManager->AddMesh("Cone", "assets/models/cone.glb");
-    AssetManager->AddMesh("Cube", "assets/models/cube.glb");
+    AssetManager->AddMesh("Collectable", "assets/models/collectable.fbx");
+    AssetManager->AddMesh("Cone", "assets/models/cone.fbx");
+    AssetManager->AddMesh("Cube", "assets/models/cube.fbx");
     AssetManager->AddMesh("Jupiter", "assets/models/jupiter.fbx");
     AssetManager->AddMesh("Mii", "assets/models/mii.fbx");
-    AssetManager->AddMesh("Sphere", "assets/models/sphere.glb");
+    AssetManager->AddMesh("Sphere", "assets/models/sphere.fbx");
+    AssetManager->AddMesh("Terrain", "assets/models/Terrain_1.fbx");
 }
 
 void ZenEditor::CreateNewScene(bool addDefaultEntities)
