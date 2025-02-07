@@ -107,6 +107,14 @@ void ZenEditor::OnRenderUI()
     m_contentBrowserPanel.Display();
     m_sceneHeirarchyPanel.Display();
     m_sceneViewportPanel.Display(m_framebuffer, postProcessingShader);
+
+    ImGui::Begin("Assets");
+
+    ImGui::SeparatorText("Meshes");
+    for (std::string& name : AssetManager->GetAllMeshNames())
+        ImGui::Text("%s", name.c_str());
+
+    ImGui::End();
 }
 
 void ZenEditor::SetupShaders()

@@ -12,6 +12,7 @@
 
 namespace Graphics
 {
+    static std::vector<Texture> loadedTextures;
     u32 Mesh::LoadFlags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_PreTransformVertices;
 
     static void UploadMeshData(Mesh& mesh)
@@ -52,41 +53,10 @@ namespace Graphics
         DeleteBuffer(mesh.indexBuffer);
     }
 
-    Mesh CreateMesh(Vertex* vertices, u32 vertexCount, u32* indices, u32 indexCount)
+    static Mesh ProcessMesh(aiMesh* aMesh, const aiScene* model)
     {
         Mesh mesh;
-        mesh.vertexCount = vertexCount;
-        mesh.indexCount = indexCount;
-        mesh.vertices.resize(vertexCount);
-        mesh.indices.resize(indexCount);
-
-        for (u32 i = 0; i < vertexCount; i++)
-            mesh.vertices[i] = vertices[i];
-
-        for (u32 i = 0; i < indexCount; i++)
-            mesh.indices[i] = indices[i];
-
-        UploadMeshData(mesh);
-
-        return mesh;
-    }
-
-    Mesh LoadMesh(const char* path)
-    {
-        Mesh mesh;
-        mesh.path = path;
-        mesh.material = LoadMaterial(path);
-
-        Assimp::Importer importer;
-        const aiScene* model = importer.ReadFile(path, Mesh::LoadFlags);
-
-        if (model == NULL || model->mRootNode == NULL)
-        {
-            WARN("Failed to load mesh %s...", path);
-            return mesh;
-        }
-
-        const aiMesh* aMesh = model->mMeshes[0];
+        mesh.name = aMesh->mName.C_Str();
 
         mesh.vertices.reserve(aMesh->mNumVertices);
         for (u32 i = 0; i < aMesh->mNumVertices; i++)
@@ -125,9 +95,70 @@ namespace Graphics
         }
         mesh.indexCount = mesh.indices.size();
 
+        aiMaterial* aMaterial = model->mMaterials[aMesh->mMaterialIndex];
+
+        bool skipTextureLoad = false;
+        aiString aPath;
+        aMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &aPath);
+
+        // The texture has already been loaded, so don't load it again.
+        for (auto& texture : loadedTextures)
+        {
+            if (strcmp(texture.path.c_str(), aPath.C_Str()) == 0)
+            {
+                skipTextureLoad = true;
+                mesh.material.diffuseMap = texture;
+                break;
+            }
+        }
+
+        // The texture hasn't been loaded yet, so load it.
+        if (!skipTextureLoad && aPath.length > 3)
+        {
+            Texture texture = LoadTexture(aPath.C_Str(), TextureFormat::RGBA, true);
+            mesh.material.diffuseMap = texture;
+            loadedTextures.push_back(texture);
+        }
+
+        aiColor3D diffuseColor(0.f, 0.f, 0.f);
+        if (aMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == AI_SUCCESS)
+            mesh.material.diffuse = glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b);
+
         UploadMeshData(mesh);
 
         return mesh;
+    }
+
+    static void ProcessNode(std::vector<Mesh>& meshes, aiNode* node, const aiScene* model)
+    {
+        for (u32 i = 0; i < node->mNumMeshes; i++)
+        {
+            aiMesh* aMesh = model->mMeshes[node->mMeshes[i]];
+            Mesh mesh = ProcessMesh(aMesh, model);
+            meshes.push_back(mesh);
+        }
+
+        for (u32 i = 0; i < node->mNumChildren; i++)
+            ProcessNode(meshes, node->mChildren[i], model);
+    }
+
+    std::vector<Mesh> LoadMeshes(const char* path)
+    {
+        std::vector<Mesh> meshes;
+
+        Assimp::Importer importer;
+        const aiScene* model = importer.ReadFile(path, Mesh::LoadFlags);
+
+        if (model == NULL || model->mRootNode == NULL)
+        {
+            WARN("Failed to load model %s...", path);
+            return meshes;
+        }
+
+        meshes.reserve(model->mNumMeshes);
+        ProcessNode(meshes, model->mRootNode, model);
+
+        return meshes;
     }
 
     void UnloadMesh(Mesh& mesh)

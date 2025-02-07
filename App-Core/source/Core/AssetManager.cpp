@@ -59,44 +59,18 @@ namespace Core
 
     void AssetResourceManager::AddMesh(const char* name, const char* path)
     {
-        if (m_meshes.find(name) != m_meshes.end())
+        std::vector<Graphics::Mesh> meshes = Graphics::LoadMeshes(path);
+
+        for (u32 i = 0; i < meshes.size(); i++)
         {
-            WARN("Skipping adding mesh %s to asset manager because it's already loaded");
-            return;
+            Graphics::Mesh& mesh = meshes[i];
+
+            if (m_meshes.find(mesh.name) != m_meshes.end())
+                mesh.name = mesh.name + std::to_string(i);
+
+            mesh.path = path;
+            m_meshes[mesh.name] = mesh;
+            INFO("Successfully loaded model %s to asset manager", name);
         }
-
-        Graphics::Mesh mesh = Graphics::LoadMesh(path);
-        mesh.name = name;
-        m_meshes[name] = mesh;
-
-        INFO("Successfully loaded mesh %s to asset manager", name);
-    }
-
-    Graphics::Material* AssetResourceManager::GetMaterial(const char* name)
-    {
-        Graphics::Material* material = NULL;
-
-        if (m_meshes.find(name) == m_meshes.end())
-        {
-            WARN("Cannot get material %s from asset manager because it hasn't been loaded", name);
-            return material;
-        }
-
-        material = &m_materials[name];
-        return material;
-    }
-
-    void AssetResourceManager::AddMaterial(const char* name, const char* path)
-    {
-        if (m_meshes.find(name) != m_meshes.end())
-        {
-            WARN("Skipping adding material %s to asset manager because it's already loaded", name);
-            return;
-        }
-
-        Graphics::Material material = Graphics::LoadMaterial(path);
-        m_materials[name] = material;
-
-        INFO("Successfully loaded mesh %s to asset manager", name);
     }
 }

@@ -27,7 +27,6 @@ namespace Graphics
         static u32 LoadFlags;
     };
 
-    Mesh CreateMesh(Vertex* vertices, u32 vertexCount, u32* indices, u32 indexCount);
-    Mesh LoadMesh(const char* path);
+    std::vector<Mesh> LoadMeshes(const char* path);
     void UnloadMesh(Mesh& mesh);
 }

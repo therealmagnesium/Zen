@@ -10,6 +10,5 @@ namespace Graphics
         Texture diffuseMap;
     };
 
-    Material LoadMaterial(const char* path);
     void UnloadMaterial(Material& material);
 }
