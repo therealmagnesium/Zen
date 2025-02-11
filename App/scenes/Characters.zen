@@ -1,0 +1,81 @@
+Scene: Untitled
+Entities:
+  - Entity: 12837192873
+    Tag: Main Camera
+    Transform Component:
+      Position: [-2.892, 3.832, 8.052]
+      Rotation: [-90.6, -6.2, 0]
+      Scale: [1, 1, 1]
+    Camera Component:
+      Camera:
+        FOV: 45
+        Speed: 8
+        Direction: [-0.010410543, -0.10799936, -0.9940965]
+        Up: [0, 1, 0]
+        Is Locked?: false
+      Is Primary?: true
+  - Entity: 12837192873
+    Tag: Directional Light
+    Transform Component:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Directional Light Component:
+      Intensity: 2.5
+      Direction: [0.3, -0.3, -0.95]
+      Color: [1, 1, 1]
+  - Entity: 12837192873
+    Tag: Alpha_Joints
+    Transform Component:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [3, 3, 3]
+    Mesh Component:
+      Name: Alpha_Joints.001
+      Path: assets/models/ybot.fbx
+      Material:
+        Diffuse: [0.15355153, 0.21289387, 0.22221714]
+  - Entity: 12837192873
+    Tag: Alpha_Surface
+    Transform Component:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [3, 3, 3]
+    Mesh Component:
+      Name: Alpha_Surface.001
+      Path: assets/models/ybot.fbx
+      Material:
+        Diffuse: [0.09657001, 0.4216198, 0.522]
+  - Entity: 12837192873
+    Tag: Beta_Joints
+    Transform Component:
+      Position: [-6, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [3, 3, 3]
+    Mesh Component:
+      Name: Beta_Joints
+      Path: assets/models/xbot.fbx
+      Material:
+        Diffuse: [0.33333334, 0.12452888, 0.10101473]
+  - Entity: 12837192873
+    Tag: Beta_Surface
+    Transform Component:
+      Position: [-6, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [3, 3, 3]
+    Mesh Component:
+      Name: Beta_Joints1
+      Path: assets/models/xbot.fbx
+      Material:
+        Diffuse: [0.8327402, 0.13928397, 0.1700286]
+  - Entity: 12837192873
+    Tag: Entity
+    Transform Component:
+      Position: [-3, 2.4, 3.4]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh Component:
+      Name: Mii
+      Path: assets/models/mii.fbx
+      Material:
+        Diffuse: [0.8, 0.8, 0.8]

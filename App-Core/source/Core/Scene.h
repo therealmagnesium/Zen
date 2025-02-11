@@ -15,7 +15,8 @@ namespace Core
         inline std::vector<std::shared_ptr<Entity>>& GetEntities() { return m_entityManager.GetEntities(); }
 
         void Initialize(bool addDefaultEntities);
-        void Update(Graphics::Shader& shader);
+        void Update();
+        void DrawEntities(Graphics::Shader& shader);
 
         std::shared_ptr<Entity> AddEntity(const char* tag);
         void DestroyEntity(std::shared_ptr<Entity>& entity);

@@ -1,0 +1,70 @@
+Scene: Untitled
+Entities:
+  - Entity: 12837192873
+    Tag: Main Camera
+    Transform Component:
+      Position: [5.038, 2.334, 10.577]
+      Rotation: [-110.9, -3.1, 0]
+      Scale: [1, 1, 1]
+    Camera Component:
+      Camera:
+        FOV: 45
+        Speed: 8
+        Direction: [-0.35621595, -0.054078817, -0.9328375]
+        Up: [0, 1, 0]
+        Is Locked?: false
+      Is Primary?: true
+  - Entity: 12837192873
+    Tag: Directional Light
+    Transform Component:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Directional Light Component:
+      Intensity: 2.5
+      Direction: [0.2, -0.86, -0.95]
+      Color: [1, 1, 1]
+  - Entity: 12837192873
+    Tag: Terrain_Cliff
+    Transform Component:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh Component:
+      Name: Plane.001
+      Path: assets/models/Terrain_1.fbx
+      Material:
+        Diffuse: [0.49102083, 0.24228114, 0.04666509]
+  - Entity: 12837192873
+    Tag: Terrain_Grass
+    Transform Component:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh Component:
+      Name: Plane.0011
+      Path: assets/models/Terrain_1.fbx
+      Material:
+        Diffuse: [0.3496862, 0.6266612, 0.11123091]
+  - Entity: 12837192873
+    Tag: Character
+    Transform Component:
+      Position: [3.3, 0.8, 5.5]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh Component:
+      Name: Mii
+      Path: assets/models/mii.fbx
+      Material:
+        Diffuse: [0.8, 0.8, 0.8]
+  - Entity: 12837192873
+    Tag: Jupiter
+    Transform Component:
+      Position: [-49.4, 20.2, -65.7]
+      Rotation: [0, 0, 0]
+      Scale: [2, 2, 2]
+    Mesh Component:
+      Name: Jupiter
+      Path: assets/models/jupiter.fbx
+      Material:
+        Diffuse: [0.8, 0.8, 0.8]

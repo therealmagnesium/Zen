@@ -51,15 +51,9 @@ namespace Graphics
         void CullFace(FaceCull cull);
         void WriteDepth(bool shouldWriteDepth);
 
-        void ProcessEntity(std::shared_ptr<Core::Entity>& entity);
-
         void Prepare(Shader& shader);
-        void DrawEntities(Shader& shader);
+        void DrawMesh(Mesh* mesh, glm::mat4& transform, Shader& shader);
         void DrawSkybox(Skybox& skybox, Mesh* cubeMesh, Shader& shader);
-
-    private:
-        void PrepareMesh(Mesh* mesh, Shader& shader);
-        void UnprepareMesh();
 
     private:
         Camera* m_primaryCamera = NULL;
@@ -68,9 +62,6 @@ namespace Graphics
         float m_gammaCorrection = 2.2f;
         glm::vec3 m_clearColor = glm::vec3(1.f);
         glm::mat4 m_projection = glm::mat4(1.f);
-
-        std::unordered_map<Mesh*, std::vector<glm::mat4>> m_meshTransformsMap;
-        std::unordered_map<Mesh*, std::vector<std::shared_ptr<Core::Entity>>> m_meshEntitiesMap;
     };
 
     extern RenderManager* Renderer;

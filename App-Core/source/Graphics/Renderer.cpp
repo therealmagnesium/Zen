@@ -1,7 +1,6 @@
 #include "Graphics/Renderer.h"
 #include "Core/Application.h"
 #include "Core/Log.h"
-#include "Graphics/RenderCommand.h"
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -97,72 +96,54 @@ namespace Graphics
         glDepthMask(shouldWriteDepth);
     }
 
-    void RenderManager::ProcessEntity(std::shared_ptr<Core::Entity>& entity)
-    {
-        if (entity->HasComponent<Core::MeshComponent>())
-        {
-            auto& tc = entity->GetComponent<Core::TransformComponent>();
-            auto& mc = entity->GetComponent<Core::MeshComponent>();
-
-            std::vector<std::shared_ptr<Core::Entity>>& batch = m_meshEntitiesMap[&mc.mesh];
-            std::vector<glm::mat4>& transformsBatch = m_meshTransformsMap[&mc.mesh];
-            mc.mesh.normalMatrix = glm::transpose(glm::inverse(tc.transform));
-
-            if (batch.size() != 0)
-                batch.push_back(entity);
-            else
-            {
-                std::vector<std::shared_ptr<Core::Entity>> newBatch;
-                newBatch.push_back(entity);
-                m_meshEntitiesMap[&mc.mesh] = newBatch;
-            }
-
-            if (transformsBatch.size() != 0)
-                transformsBatch.push_back(tc.transform);
-            else
-            {
-                std::vector<glm::mat4> newBatch;
-                newBatch.push_back(tc.transform);
-                m_meshTransformsMap[&mc.mesh] = newBatch;
-            }
-        }
-    }
-
     void RenderManager::Prepare(Shader& shader)
     {
         if (m_primaryCamera != NULL)
         {
+            BindShader(shader);
+
             shader.SetVec3("cameraPosition", m_primaryCamera->position);
             shader.SetMat4("viewMatrix", m_primaryCamera->view);
             shader.SetMat4("projectionMatrix", m_projection);
+
+            UnbindShader();
         }
     }
 
-    void RenderManager::DrawEntities(Shader& shader)
+    void RenderManager::DrawMesh(Mesh* mesh, glm::mat4& transform, Shader& shader)
     {
-        if (m_primaryCamera != NULL)
+        if (m_primaryCamera != NULL && mesh != NULL)
         {
-            CullFace(FaceCull::Back);
+            (mesh->shouldCullBackface) ? CullFace(FaceCull::Back) : CullFace(FaceCull::Front);
 
-            for (auto& [mesh, entities] : m_meshEntitiesMap)
-            {
-                if (mesh != NULL)
-                {
-                    if (!mesh->shouldCullBackface)
-                        CullFace(FaceCull::Front);
+            BindVertexArray(mesh->vertexArray);
+            BindIndexBuffer(mesh->indexBuffer);
+            BindTexture(mesh->material.diffuseMap, 0);
 
-                    PrepareMesh(mesh, shader);
+            glm::mat4 normalMatrix = glm::transpose(glm::inverse(transform));
 
-                    glDrawElementsInstanced(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, NULL,
-                                            m_meshTransformsMap[mesh].size());
+            BindShader(shader);
 
-                    UnprepareMesh();
-                }
-            }
+            shader.SetMat4("transformMatrix", transform);
+            shader.SetMat4("normalMatrix", normalMatrix);
+            shader.SetMaterial("material", mesh->material);
+
+            glEnableVertexAttribArray(0);
+            glEnableVertexAttribArray(1);
+            glEnableVertexAttribArray(2);
+
+            glDrawElements(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, NULL);
+
+            glDisableVertexAttribArray(0);
+            glDisableVertexAttribArray(1);
+            glDisableVertexAttribArray(2);
+
+            UnbindShader();
+
+            UnbindIndexBuffer();
+            UnbindVertexArray();
+            UnbindTexture();
         }
-
-        m_meshEntitiesMap.clear();
-        m_meshTransformsMap.clear();
     }
 
     void RenderManager::DrawSkybox(Skybox& skybox, Mesh* cubeMesh, Shader& shader)
@@ -179,6 +160,8 @@ namespace Graphics
 
         if (cubeMesh != NULL)
         {
+            CullFace(FaceCull::Front);
+
             BindVertexArray(cubeMesh->vertexArray);
             BindIndexBuffer(cubeMesh->indexBuffer);
             BindSkybox(skybox);
@@ -196,67 +179,11 @@ namespace Graphics
             UnbindSkybox();
             UnbindIndexBuffer();
             UnbindVertexArray();
+
+            CullFace(FaceCull::Back);
         }
 
         UnbindShader();
         WriteDepth(true);
-    }
-
-    void RenderManager::PrepareMesh(Mesh* mesh, Shader& shader)
-    {
-        if (mesh != NULL)
-        {
-            std::vector<glm::mat4>& batch = m_meshTransformsMap[mesh];
-
-            BindVertexBuffer(mesh->instanceBuffer);
-            RenderCommand::SendDataToBuffer(mesh->instanceBuffer, BufferType::Array, batch.data(),
-                                            batch.size() * sizeof(glm::mat4));
-
-            BindVertexArray(mesh->vertexArray);
-
-            RenderCommand::SetAttributeLocation(mesh->vertexArray, 3, 4, 4 * sizeof(glm::vec4), 0 * sizeof(glm::vec4));
-            RenderCommand::SetAttributeLocation(mesh->vertexArray, 4, 4, 4 * sizeof(glm::vec4), 1 * sizeof(glm::vec4));
-            RenderCommand::SetAttributeLocation(mesh->vertexArray, 5, 4, 4 * sizeof(glm::vec4), 2 * sizeof(glm::vec4));
-            RenderCommand::SetAttributeLocation(mesh->vertexArray, 6, 4, 4 * sizeof(glm::vec4), 3 * sizeof(glm::vec4));
-
-            glVertexAttribDivisor(3, 1);
-            glVertexAttribDivisor(4, 1);
-            glVertexAttribDivisor(5, 1);
-            glVertexAttribDivisor(6, 1);
-
-            UnbindVertexArray();
-
-            UnbindVertexBuffer();
-
-            BindVertexArray(mesh->vertexArray);
-            BindIndexBuffer(mesh->indexBuffer);
-            BindTexture(mesh->material.diffuseMap, 0);
-
-            shader.SetMat4("normalMatrix", mesh->normalMatrix);
-            shader.SetMaterial("material", mesh->material);
-
-            glEnableVertexAttribArray(0);
-            glEnableVertexAttribArray(1);
-            glEnableVertexAttribArray(2);
-            glEnableVertexAttribArray(3);
-            glEnableVertexAttribArray(4);
-            glEnableVertexAttribArray(5);
-            glEnableVertexAttribArray(6);
-        }
-    }
-
-    void RenderManager::UnprepareMesh()
-    {
-        glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
-        glDisableVertexAttribArray(2);
-        glDisableVertexAttribArray(3);
-        glDisableVertexAttribArray(4);
-        glDisableVertexAttribArray(5);
-        glDisableVertexAttribArray(6);
-
-        UnbindIndexBuffer();
-        UnbindVertexArray();
-        UnbindTexture();
     }
 }

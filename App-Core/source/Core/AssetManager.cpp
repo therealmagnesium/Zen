@@ -70,7 +70,8 @@ namespace Core
 
             mesh.path = path;
             m_meshes[mesh.name] = mesh;
-            INFO("Successfully loaded model %s to asset manager", name);
         }
+
+        INFO("Successfully loaded model %s to asset manager", name);
     }
 }

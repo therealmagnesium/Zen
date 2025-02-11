@@ -6,9 +6,10 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 
+static Shader instancingShader;
+static Shader phongShader;
 static Shader postProcessingShader;
 static Shader skyboxShder;
-static Shader instancingShader;
 
 static const char* skyboxTexturePaths[6];
 
@@ -37,13 +38,14 @@ void ZenEditor::OnShutdown()
     UnloadSkybox(m_skybox);
 
     UnloadShader(instancingShader);
-    UnloadShader(skyboxShder);
+    UnloadShader(phongShader);
     UnloadShader(postProcessingShader);
+    UnloadShader(skyboxShder);
 }
 
 void ZenEditor::OnUpdate()
 {
-    m_activeScene.Update(instancingShader);
+    m_activeScene.Update();
 
     if (IsKeyDown(KEY_LEFT_CTRL))
     {
@@ -63,19 +65,9 @@ void ZenEditor::OnRender()
 
     if (Renderer->GetPrimaryCamera() != NULL)
     {
-        Renderer->CullFace(FaceCull::Front);
         Renderer->DrawSkybox(m_skybox, AssetManager->GetMesh("Cube"), skyboxShder);
-
-        BindShader(instancingShader);
-
-        Renderer->Prepare(instancingShader);
-
-        for (auto& entity : m_activeScene.GetEntities())
-            Renderer->ProcessEntity(entity);
-
-        Renderer->DrawEntities(instancingShader);
-
-        UnbindShader();
+        Renderer->Prepare(phongShader);
+        m_activeScene.DrawEntities(phongShader);
     }
 
     UnbindFramebuffer();
@@ -130,6 +122,15 @@ void ZenEditor::SetupShaders()
     skyboxShder.CreateUniform("projectionMatrix");
     skyboxShder.CreateUniform("skybox");
 
+    phongShader = LoadShader("assets/shaders/Default_vs.glsl", "assets/shaders/Default_fs.glsl");
+    phongShader.CreateMaterialUniform("material");
+    phongShader.CreateDirectionalLightUniform("directionalLight");
+    phongShader.CreateUniform("cameraPosition");
+    phongShader.CreateUniform("transformMatrix");
+    phongShader.CreateUniform("normalMatrix");
+    phongShader.CreateUniform("viewMatrix");
+    phongShader.CreateUniform("projectionMatrix");
+
     instancingShader = LoadShader("assets/shaders/Instancing_vs.glsl", "assets/shaders/Default_fs.glsl");
     instancingShader.CreateMaterialUniform("material");
     instancingShader.CreateDirectionalLightUniform("directionalLight");
@@ -160,6 +161,8 @@ void ZenEditor::SetupAssets()
     AssetManager->AddMesh("Mii", "assets/models/mii.fbx");
     AssetManager->AddMesh("Sphere", "assets/models/sphere.fbx");
     AssetManager->AddMesh("Terrain", "assets/models/Terrain_1.fbx");
+    AssetManager->AddMesh("X Bot", "assets/models/xbot.fbx");
+    AssetManager->AddMesh("Y Bot", "assets/models/ybot.fbx");
 }
 
 void ZenEditor::CreateNewScene(bool addDefaultEntities)

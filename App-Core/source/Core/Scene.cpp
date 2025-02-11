@@ -25,7 +25,7 @@ namespace Core
         }
     }
 
-    void Scene::Update(Graphics::Shader& shader)
+    void Scene::Update()
     {
         m_entityManager.Update();
         Graphics::Renderer->SetPrimaryCamera(&m_editorCamera);
@@ -39,14 +39,6 @@ namespace Core
         for (auto& entity : m_entityManager.GetEntities())
         {
             auto& tc = entity->GetComponent<TransformComponent>();
-            if (entity->HasComponent<DirectionalLightComponent>())
-            {
-                auto& dlc = entity->GetComponent<DirectionalLightComponent>();
-
-                Graphics::BindShader(shader);
-                shader.SetLight("directionalLight", dlc.light);
-                Graphics::UnbindShader();
-            }
 
             if (entity->HasComponent<CameraComponent>())
             {
@@ -58,6 +50,29 @@ namespace Core
                     Graphics::Renderer->SetPrimaryCamera(&cc.camera);
 
                 Graphics::UpdateCamera(cc.camera);
+            }
+        }
+    }
+
+    void Scene::DrawEntities(Graphics::Shader& shader)
+    {
+        for (auto& entity : m_entityManager.GetEntities())
+        {
+            auto& tc = entity->GetComponent<TransformComponent>();
+
+            if (entity->HasComponent<DirectionalLightComponent>())
+            {
+                auto& dlc = entity->GetComponent<DirectionalLightComponent>();
+
+                Graphics::BindShader(shader);
+                shader.SetLight("directionalLight", dlc.light);
+                Graphics::UnbindShader();
+            }
+
+            if (entity->HasComponent<MeshComponent>())
+            {
+                auto& mc = entity->GetComponent<MeshComponent>();
+                Graphics::Renderer->DrawMesh(&mc.mesh, tc.transform, shader);
             }
         }
     }
