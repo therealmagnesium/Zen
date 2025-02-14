@@ -48,7 +48,11 @@ namespace Core
         Graphics::Mesh mesh;
 
         MeshComponent() = default;
-        MeshComponent(Graphics::Mesh* mesh) { this->mesh = *mesh; };
+        MeshComponent(Graphics::Mesh* mesh)
+        {
+            if (mesh != NULL)
+                this->mesh = *mesh;
+        }
     };
 
     struct DirectionalLightComponent

@@ -106,6 +106,10 @@ void ZenEditor::OnRenderUI()
     for (std::string& name : AssetManager->GetAllMeshNames())
         ImGui::Text("%s", name.c_str());
 
+    ImGui::SeparatorText("Textures");
+    for (std::string& name : AssetManager->GetAllTextureNames())
+        ImGui::Text("%s", name.c_str());
+
     ImGui::End();
 }
 

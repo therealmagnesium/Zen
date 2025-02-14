@@ -22,7 +22,7 @@ Entities:
       Scale: [1, 1, 1]
     Directional Light Component:
       Intensity: 2.5
-      Direction: [0.3, -0.3, -0.95]
+      Direction: [0.2, -1, -0.95]
       Color: [1, 1, 1]
   - Entity: 12837192873
     Tag: Alpha_Joints
@@ -71,7 +71,7 @@ Entities:
   - Entity: 12837192873
     Tag: Entity
     Transform Component:
-      Position: [-3, 2.4, 3.4]
+      Position: [-3, 2.5, 3.4]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     Mesh Component:
@@ -79,3 +79,25 @@ Entities:
       Path: assets/models/mii.fbx
       Material:
         Diffuse: [0.8, 0.8, 0.8]
+  - Entity: 12837192873
+    Tag: Terrain_Cliff
+    Transform Component:
+      Position: [0, 0, 0]
+      Rotation: [0, 90, 0]
+      Scale: [3, 3, 3]
+    Mesh Component:
+      Name: Plane.001
+      Path: assets/models/Terrain_1.fbx
+      Material:
+        Diffuse: [0.49102083, 0.24228114, 0.04666509]
+  - Entity: 12837192873
+    Tag: Terrain_Grass
+    Transform Component:
+      Position: [0, 0, 0]
+      Rotation: [0, 90, 0]
+      Scale: [3, 3, 3]
+    Mesh Component:
+      Name: Plane.0011
+      Path: assets/models/Terrain_1.fbx
+      Material:
+        Diffuse: [0.6266612, 0.4936928, 0.11123091]

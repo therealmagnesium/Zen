@@ -1,18 +1,18 @@
 #include "Graphics/Mesh.h"
-#include "Graphics/Renderer.h"
 #include "Graphics/RenderCommand.h"
 
+#include "Core/AssetManager.h"
 #include "Core/Log.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
+#include <filesystem>
 #include <string>
 #include <vector>
 
 namespace Graphics
 {
-    static std::vector<Texture> loadedTextures;
     u32 Mesh::LoadFlags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_PreTransformVertices;
 
     static void UploadMeshData(Mesh& mesh)
@@ -102,7 +102,7 @@ namespace Graphics
         aMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &aPath);
 
         // The texture has already been loaded, so don't load it again.
-        for (auto& texture : loadedTextures)
+        for (auto& [name, texture] : Core::AssetManager->GetAllTextures())
         {
             if (strcmp(texture.path.c_str(), aPath.C_Str()) == 0)
             {
@@ -115,9 +115,14 @@ namespace Graphics
         // The texture hasn't been loaded yet, so load it.
         if (!skipTextureLoad && aPath.length > 3)
         {
-            Texture texture = LoadTexture(aPath.C_Str(), TextureFormat::RGBA, true);
-            mesh.material.diffuseMap = texture;
-            loadedTextures.push_back(texture);
+            std::string meshName = aMesh->mName.C_Str();
+            std::string pathString = aPath.C_Str();
+            std::filesystem::path path(pathString);
+            std::string name = meshName + "_" + path.filename().stem().c_str();
+
+            Core::AssetManager->AddTexture(name.c_str(), aPath.C_Str());
+            Texture* texture = Core::AssetManager->GetTexture(name.c_str());
+            mesh.material.diffuseMap = *texture;
         }
 
         aiColor3D diffuseColor(0.f, 0.f, 0.f);
@@ -169,6 +174,5 @@ namespace Graphics
         mesh.indices.clear();
 
         DeleteMeshData(mesh);
-        UnloadMaterial(mesh.material);
     }
 }

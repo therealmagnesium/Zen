@@ -29,7 +29,11 @@ namespace Core
         for (auto& [name, mesh] : m_meshes)
             Graphics::UnloadMesh(mesh);
 
+        for (auto& [name, texture] : m_textures)
+            Graphics::UnloadTexture(texture);
+
         m_meshes.clear();
+        m_textures.clear();
     }
 
     Graphics::Mesh* AssetResourceManager::GetMesh(const char* name)
@@ -73,5 +77,53 @@ namespace Core
         }
 
         INFO("Successfully loaded model %s to asset manager", name);
+    }
+
+    Graphics::Texture* AssetResourceManager::GetTexture(const char* name)
+    {
+        Graphics::Texture* texture = NULL;
+
+        if (m_textures.find(name) != m_textures.end())
+        {
+            texture = &m_textures[name];
+            return texture;
+        }
+        else
+        {
+            WARN("Failed to get texture %s from the asset manager", name);
+            return NULL;
+        }
+    }
+
+    std::vector<std::string> AssetResourceManager::GetAllTextureNames()
+    {
+        std::vector<std::string> textureNames;
+        textureNames.reserve(m_textures.size());
+
+        for (auto& [name, texture] : m_textures)
+            textureNames.push_back(name);
+
+        return textureNames;
+    }
+
+    void AssetResourceManager::AddTexture(const char* name, const char* path)
+    {
+        if (m_textures.find(name) != m_textures.end())
+        {
+            WARN("Cannot add texture %s to asset manager because it's already loaded", name);
+            return;
+        }
+
+        Graphics::Texture texture = Graphics::LoadTexture(path, Graphics::TextureFormat::RGBA, true);
+        std::string keyName = name;
+
+        m_textures[keyName] = texture;
+
+        INFO("Successfully loaded texture %s to asset manager", name);
+    }
+
+    std::unordered_map<std::string, Graphics::Texture> AssetResourceManager::GetAllTextures()
+    {
+        return m_textures;
     }
 }

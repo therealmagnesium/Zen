@@ -9,6 +9,4 @@ namespace Graphics
         glm::vec3 diffuse = glm::vec3(1.f);
         Texture diffuseMap;
     };
-
-    void UnloadMaterial(Material& material);
 }
